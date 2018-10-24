@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>MITRA TEKNIK</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">
@@ -45,7 +45,7 @@
             }
 
             .title {
-                font-size: 84px;
+                font-size: 80px;
             }
 
             .links > a {
@@ -71,26 +71,24 @@
                         <a href="{{ url('/home') }}">Home</a>
                     @else
                         <a href="{{ route('login') }}">Login</a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}">Register</a>
-                        @endif
                     @endauth
                 </div>
             @endif
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel
+                    <img src="{{asset('img/logo.jpeg')}}" alt="" style="height:60px">
+                    MITRA TEKNIK
                 </div>
+                General Trade & Supplier : Fingerprint Time & Attendance, Access Control, CCTV, Metal Detektor, Guard Tour System
 
-                <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://nova.laravel.com">Nova</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+                <div class="links" style="margin-top:100px">
+                    <a href="http://www.mitrateknik.co.id/">Home</a>
+                    <a href="http://www.mitrateknik.co.id/Table/About/">About</a>
+                    <a href="http://www.mitrateknik.co.id/Product/">Product</a>
+                    <a href="http://www.mitrateknik.co.id/Table/Services/">Services</a>
+                    <a href="http://www.mitrateknik.co.id/Gallery/">Gallery</a>
+                    <a href="http://www.mitrateknik.co.id/Website-Owner.html">Contact Us</a>
                 </div>
             </div>
         </div>
