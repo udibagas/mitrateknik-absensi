@@ -8,15 +8,75 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+import VueRouter from 'vue-router'
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+import locale from 'element-ui/lib/locale/lang/en'
 
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
+Vue.use(ElementUI, { locale });
+Vue.use(VueRouter);
 
-Vue.component('example-component', require('./components/ExampleComponent.vue'));
+import { library } from '@fortawesome/fontawesome-svg-core'
+import {
+    faHome,
+    faUsers,
+    faFilter,
+    faClock,
+    faSignOutAlt
+} from '@fortawesome/free-solid-svg-icons'
+
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(
+    faHome,
+    faUsers,
+    faFilter,
+    faClock,
+    faSignOutAlt
+)
+
+Vue.component('font-awesome-icon', FontAwesomeIcon)
+
+import App from './views/App'
+import Home from './views/Home'
+import User from './views/User'
+import PegawaiDashboard from './views/PegawaiDashboard'
+import NotFound from './views/NotFound'
+import moment from 'moment'
+
+const router = new VueRouter({
+    mode: 'history',
+    routes: [
+        {
+            path: '/home',
+            name: 'home',
+            component: Home
+        },
+        {
+            path: '/user',
+            name: 'user',
+            component: User
+        },
+        {
+            path: '/pegawai/:nik',
+            name: 'pegawai',
+            component: PegawaiDashboard
+        },
+        { path: '*', component: NotFound }
+    ]
+})
 
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+    components: { App },
+    router,
+    data: {
+        time: moment().format('DD MMM YYYY HH:mm:ss')
+    },
+    mounted: function() {
+        let vm = this
+        setInterval(function () {
+            vm.time = moment().format('DD MMM YYYY HH:mm:ss')
+        }, 1000)
+    }
 });

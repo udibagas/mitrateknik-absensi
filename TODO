@@ -1,1 +1,13 @@
-setting app.js dan bootstrap.js
+- History absen (bentuk table, filterable, exportable to excel)
+- Presentase rata - rata produktivitas semua pegawai
+- grafik jam kerja rata2 pegawai
+- list karyawan paling produktif
+- list karyawan paling tidak produktif
+
+- History absen (bentuk table, filterable, exportable to excel)
+- Jam kerja kurang
+- presentase produktivitas
+- grafik jam kerja (filterable, bisa mingguan, atau bulanan, atau pilih periode sendiri)
+
+
+- User admin bisa mengedit log absensi untuk penyesuaian jika pegawai lupa absen atau sudah absen tetepai tidak masuk ke log
