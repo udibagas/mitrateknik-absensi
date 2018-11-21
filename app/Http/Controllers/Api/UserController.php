@@ -30,12 +30,14 @@ class UserController extends Controller
     {
         $input = $request->all();
         $input['password'] = bcrypt($request->password);
+        $input['api_token'] = str_random(60);
         return User::create($input);
     }
 
     public function update(User $user, UserRequest $request)
     {
         $input = $request->all();
+        $input['api_token'] = str_random(60);
 
         if ($request->password) {
             $input['password'] = bcrypt($request->password);

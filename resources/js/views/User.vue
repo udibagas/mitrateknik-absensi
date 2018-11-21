@@ -192,7 +192,7 @@ export default {
         store: function() {
             let _this = this;
             _this.loading = true;
-
+            _this.formData.api_token = USER.api_token
             axios.post(API_URL + '/user', _this.formData)
                 .then(function(r) {
                     _this.loading = false;
@@ -219,7 +219,7 @@ export default {
         update: function() {
             let _this = this;
             _this.loading = true;
-
+            _this.formData.api_token = USER.api_token
             axios.put(API_URL + '/user/' + _this.formData.id, _this.formData)
                 .then(function(r) {
                     _this.loading = false;
@@ -265,7 +265,8 @@ export default {
 
             _this.$confirm('Anda yakin akan menghapus user ini?')
                 .then(() => {
-                    axios.delete(API_URL + '/user/' + id)
+                    let params = { api_token: USER.api_token }
+                    axios.delete(API_URL + '/user/' + id, { params: params })
                         .then(function(r) {
                             _this.requestData();
                             _this.$message({
@@ -296,7 +297,8 @@ export default {
                 keyword: _this.keyword,
                 pageSize: _this.pageSize,
                 sort: _this.sort,
-                order: _this.order
+                order: _this.order,
+                api_token: USER.api_token
             }
             _this.loading = true;
 
