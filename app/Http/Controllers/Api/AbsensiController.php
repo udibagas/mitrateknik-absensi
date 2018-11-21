@@ -29,8 +29,6 @@ class AbsensiController extends Controller
         $sql = "SELECT DISTINCT(person_pin) AS nik_var,
             CONCAT(person_name, ' ', person_last_name) AS name_var,
             att_date AS absence_date,
-            '12:00:00' AS rest_start,
-            '13:00:00' AS rest_end,
             (SELECT att_time
                 FROM att_transaction
                 WHERE person_pin = a.person_pin AND att_date = :att_date
@@ -40,7 +38,19 @@ class AbsensiController extends Controller
                 FROM att_transaction
                 WHERE person_pin = a.person_pin AND att_date = :att_date
                     AND device_id IN (4, 14, 16)
-                ORDER BY att_time DESC LIMIT 1) AS last_out
+                ORDER BY att_time DESC LIMIT 1) AS last_out,
+            (SELECT att_time
+                FROM att_transaction
+                WHERE person_pin = a.person_pin AND att_date = :att_date
+                    AND device_id IN (3, 13, 15)
+                    AND att_time BETWEEN '11:30' AND '12:55'
+                ORDER BY att_time ASC LIMIT 1) AS rest_start,
+            (SELECT att_time
+                FROM att_transaction
+                WHERE person_pin = a.person_pin AND att_date = :att_date
+                    AND device_id IN (4, 14, 16)
+                    AND att_time BETWEEN '12:30' AND '13:30'
+                ORDER BY att_time ASC LIMIT 1) AS rest_end
         FROM att_transaction a WHERE att_date = :att_date ORDER BY name_var ASC";
 
         return DB::connection('pgsql')->select($sql, [':att_date' => $date]);

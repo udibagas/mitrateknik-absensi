@@ -12,6 +12,7 @@
     <!-- Scripts -->
     <script type="text/javascript">
         const API_URL = '{{url("api")}}'
+        const USER = {!!auth()->user()!!}
     </script>
     <script src="{{ asset('js/app.js') }}" defer></script>
 
