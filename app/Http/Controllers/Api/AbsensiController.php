@@ -8,8 +8,23 @@ use DB;
 
 class AbsensiController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function index(Request $request)
     {
+        // Gate 1
+        //     IN: 13, OUT: 14
+        // Gate 2
+        //     IN: 15, OUT: 16
+        // Gate 3
+        //     IN: 3, OUT: 4
+
+        $door_in = [3, 13, 15];
+        $door_out = [4, 14, 16];
+
         $date = $request->date ? $request->date : date('Y-m-d');
         $sql = "SELECT DISTINCT(person_pin) AS nik_var,
             CONCAT(person_name, ' ', person_last_name) AS name_var,
@@ -19,12 +34,12 @@ class AbsensiController extends Controller
             (SELECT att_time
                 FROM att_transaction
                 WHERE person_pin = a.person_pin AND att_date = :att_date
-                    AND att_state IS NULL
+                    AND device_id IN (3, 13, 15)
                 ORDER BY att_time ASC LIMIT 1) AS first_in,
             (SELECT att_time
                 FROM att_transaction
                 WHERE person_pin = a.person_pin AND att_date = :att_date
-                    AND att_state = '1'
+                    AND device_id IN (4, 14, 16)
                 ORDER BY att_time DESC LIMIT 1) AS last_out
         FROM att_transaction a WHERE att_date = :att_date ORDER BY name_var ASC";
 

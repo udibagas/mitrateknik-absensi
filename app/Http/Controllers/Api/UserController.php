@@ -9,6 +9,12 @@ use App\User;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+        $this->middleware('role:1');
+    }
+
     public function index(Request $request)
     {
         $sort = $request->sort ? $request->sort : 'name';
