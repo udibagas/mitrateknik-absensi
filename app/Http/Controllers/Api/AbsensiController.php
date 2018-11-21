@@ -16,7 +16,7 @@ class AbsensiController extends Controller
     public function index(Request $request)
     {
         // Gate 1
-        //     IN: 13, OUT: 14
+        //     IN: 14, OUT: 13
         // Gate 2
         //     IN: 16, OUT: 15
         // Gate 3
@@ -29,23 +29,23 @@ class AbsensiController extends Controller
             (SELECT att_time
                 FROM att_transaction
                 WHERE person_pin = a.person_pin AND att_date = :att_date
-                    AND device_id IN (3, 13, 16)
+                    AND device_id IN (3, 14, 16)
                 ORDER BY att_time ASC LIMIT 1) AS first_in,
             (SELECT att_time
                 FROM att_transaction
                 WHERE person_pin = a.person_pin AND att_date = :att_date
-                    AND device_id IN (4, 14, 15)
+                    AND device_id IN (4, 13, 15)
                 ORDER BY att_time DESC LIMIT 1) AS last_out,
             (SELECT att_time
                 FROM att_transaction
                 WHERE person_pin = a.person_pin AND att_date = :att_date
-                    AND device_id IN (3, 13, 16)
+                    AND device_id IN (3, 14, 16)
                     AND att_time BETWEEN '11:30' AND '12:55'
                 ORDER BY att_time ASC LIMIT 1) AS rest_start,
             (SELECT att_time
                 FROM att_transaction
                 WHERE person_pin = a.person_pin AND att_date = :att_date
-                    AND device_id IN (4, 14, 15)
+                    AND device_id IN (4, 13, 15)
                     AND att_time BETWEEN '12:30' AND '13:30'
                 ORDER BY att_time ASC LIMIT 1) AS rest_end
         FROM att_transaction a WHERE att_date = :att_date ORDER BY name_var ASC";
