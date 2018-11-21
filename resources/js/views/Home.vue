@@ -4,7 +4,7 @@
         <hr>
         <el-form :inline="true" style="float:right;clear:both;margin-right:0;">
             <el-form-item>
-                <el-date-picker v-model="filterDate" type="date" value-format="yyyy-MM-dd" placeholder="Pilih Tanggal"> </el-date-picker>
+                <el-date-picker v-model="filterDate" type="daterange" value-format="yyyy-MM-dd" range-separator="-" start-placeholder="Dari Tanggal" end-placeholder="Sampai Tanggal"> </el-date-picker>
             </el-form-item>
             <el-form-item>
                 <el-button @click="exportToExcel" type="primary"><i class="el-icon-document"></i> EXPORT KE EXCEL</el-button>
@@ -20,6 +20,7 @@
             v-loading="loading"
             style="border-top:1px solid #eee;width:100%">
             <el-table-column type="index" width="50"></el-table-column>
+            <el-table-column prop="absence_date" label="Tanggal" sortable width="100"></el-table-column>
             <el-table-column prop="nik_var" label="NIK" sortable width="70"></el-table-column>
             <el-table-column prop="name_var" label="Nama" sortable>
                 <template slot-scope="scope">
@@ -57,6 +58,7 @@ export default {
     },
     watch: {
         filterDate(v, o) {
+            console.log(v);
             this.requestData()
         }
     },
@@ -80,6 +82,13 @@ export default {
                     let duration = moment.duration(keluar.diff(masuk));
                     let seconds = duration.asSeconds();
                     // jam istirahat
+                    if (!a.rest_start) {
+                        a.rest_start = '12:00:00'
+                    }
+                    if (!a.rest_end) {
+                        a.rest_end = '13:00:00'
+                    }
+
                     let rest_start = moment(a.rest_start, 'HH:mm:ss');
                     let rest_end = moment(a.rest_end, 'HH:mm:ss');
                     let rest_duration = moment.duration(rest_end.diff(rest_start));

@@ -22,34 +22,39 @@ class AbsensiController extends Controller
         // Gate 3
         //     IN: 3, OUT: 4
 
-        $date = $request->date ? $request->date : date('Y-m-d');
+        $date_start = $request->date ? $request->date[0] : date('Y-m-d');
+        $date_end = $request->date ? $request->date[1] : date('Y-m-d');
+        
         $sql = "SELECT DISTINCT(person_pin) AS nik_var,
             CONCAT(person_name, ' ', person_last_name) AS name_var,
             att_date AS absence_date,
             (SELECT att_time
                 FROM att_transaction
-                WHERE person_pin = a.person_pin AND att_date = :att_date
+                WHERE person_pin = a.person_pin AND att_date BETWEEN :att_date_start AND :att_date_end
                     AND device_id IN (3, 14, 16)
                 ORDER BY att_time ASC LIMIT 1) AS first_in,
             (SELECT att_time
                 FROM att_transaction
-                WHERE person_pin = a.person_pin AND att_date = :att_date
+                WHERE person_pin = a.person_pin AND att_date BETWEEN :att_date_start AND :att_date_end
                     AND device_id IN (4, 13, 15)
                 ORDER BY att_time DESC LIMIT 1) AS last_out,
             (SELECT att_time
                 FROM att_transaction
-                WHERE person_pin = a.person_pin AND att_date = :att_date
+                WHERE person_pin = a.person_pin AND att_date BETWEEN :att_date_start AND :att_date_end
                     AND device_id IN (4, 13, 15)
                     AND att_time BETWEEN '11:30' AND '12:55'
                 ORDER BY att_time ASC LIMIT 1) AS rest_start,
             (SELECT att_time
                 FROM att_transaction
-                WHERE person_pin = a.person_pin AND att_date = :att_date
+                WHERE person_pin = a.person_pin AND att_date BETWEEN :att_date_start AND :att_date_end
                     AND device_id IN (3, 14, 16)
                     AND att_time BETWEEN '12:30' AND '13:30'
                 ORDER BY att_time ASC LIMIT 1) AS rest_end
-        FROM att_transaction a WHERE att_date = :att_date ORDER BY name_var ASC";
+        FROM att_transaction a WHERE att_date BETWEEN :att_date_start AND :att_date_end ORDER BY name_var ASC";
 
-        return DB::connection('pgsql')->select($sql, [':att_date' => $date]);
+        return DB::connection('pgsql')->select($sql, [
+            ':att_date_start' => $date_start,
+            ':att_date_end' => $date_end
+        ]);
     }
 }
