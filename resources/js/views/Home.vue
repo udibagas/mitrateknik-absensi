@@ -51,7 +51,7 @@ export default {
     data: function() {
         return {
             absensis: [],
-            filterDate: moment().format('YYYY-MM-DD'),
+            filterDate: [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
             keyword: '',
             loading: false
         }
