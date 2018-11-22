@@ -30,15 +30,16 @@
                 </template>
             </el-table-column>
             <el-table-column prop="first_in" label="Masuk" sortable width="90"></el-table-column>
-            <el-table-column label="Istirahat" sortable width="150">
+            <el-table-column label="Jam Istirahat" sortable width="150">
                 <template slot-scope="scope">
                     {{scope.row.rest_start}} - {{scope.row.rest_end}}<br>
-                    ({{scope.row.istirahat}})
                 </template>
+            </el-table-column>
+            <el-table-column prop="istirahat" label="Lama Istirahat" sortable width="130">
             </el-table-column>
             <el-table-column prop="last_out" label="Keluar" sortable width="90"></el-table-column>
             <el-table-column prop="jam_kerja_efektif" label="Jam Kerja Efektif" width="160" sortable> </el-table-column>
-            <el-table-column prop="persentase" label="%" width="60" sortable></el-table-column>
+            <el-table-column prop="persentase" label="%" width="70" sortable></el-table-column>
         </el-table>
     </el-card>
 </template>

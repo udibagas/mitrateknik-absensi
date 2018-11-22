@@ -24,8 +24,9 @@ class AbsensiController extends Controller
 
         $date_start = $request->date ? $request->date[0] : date('Y-m-d');
         $date_end = $request->date ? $request->date[1] : date('Y-m-d');
-        
-        $sql = "SELECT DISTINCT(person_pin) AS nik_var,
+
+        $sql = "SELECT DISTINCT(att_date, person_pin) AS date_pin,
+            person_pin AS nik_var,
             CONCAT(person_name, ' ', person_last_name) AS name_var,
             att_date AS absence_date,
             (SELECT att_time
