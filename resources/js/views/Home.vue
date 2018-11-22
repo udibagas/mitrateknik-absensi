@@ -103,6 +103,8 @@ export default {
                     let jam_rest = Math.floor(rest_seconds/3600)
                     let menit_rest = Math.floor((rest_seconds%3600)/60)
                     let detik_rest = rest_seconds%60
+                    a.istirahat = `${jam_rest.toString().padStart(2, '0')}:${menit_rest.toString().padStart(2, '0')}:${detik_rest.toString().padStart(2, '0')}`
+                    let pembagi = moment(a.absence_date).day() === 5 ? 7.5*36 : 8*36
 
                     // jam kerja
                     if (a.first_in && a.last_out) {
@@ -116,8 +118,6 @@ export default {
                         let menit_kerja = Math.floor((jam_kerja_efektif%3600)/60)
                         let detik_kerja = jam_kerja_efektif%60
                         a.jam_kerja_efektif = `${jam_kerja.toString().padStart(2, '0')}:${menit_kerja.toString().padStart(2, '0')}:${detik_kerja.toString().padStart(2, '0')}`
-                        a.istirahat = `${jam_rest.toString().padStart(2, '0')}:${menit_rest.toString().padStart(2, '0')}:${detik_rest.toString().padStart(2, '0')}`
-                        let pembagi = moment(a.absence_date).day() === 5 ? 7.5*36 : 8*36
                         a.persentase = (jam_kerja_efektif / pembagi).toFixed(2)
                     }
                 })
