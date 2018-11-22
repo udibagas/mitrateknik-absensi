@@ -31,23 +31,23 @@ class AbsensiController extends Controller
             att_date AS absence_date,
             (SELECT att_time
                 FROM att_transaction
-                WHERE person_pin = a.person_pin AND att_date BETWEEN :att_date_start AND :att_date_end
+                WHERE person_pin = a.person_pin AND att_date = a.att_date
                     AND device_id IN (3, 14, 16)
                 ORDER BY att_time ASC LIMIT 1) AS first_in,
             (SELECT att_time
                 FROM att_transaction
-                WHERE person_pin = a.person_pin AND att_date BETWEEN :att_date_start AND :att_date_end
+                WHERE person_pin = a.person_pin AND att_date = a.att_date
                     AND device_id IN (4, 13, 15)
                 ORDER BY att_time DESC LIMIT 1) AS last_out,
             (SELECT att_time
                 FROM att_transaction
-                WHERE person_pin = a.person_pin AND att_date BETWEEN :att_date_start AND :att_date_end
+                WHERE person_pin = a.person_pin AND att_date = a.att_date
                     AND device_id IN (4, 13, 15)
                     AND att_time BETWEEN '11:30' AND '12:55'
                 ORDER BY att_time ASC LIMIT 1) AS rest_start,
             (SELECT att_time
                 FROM att_transaction
-                WHERE person_pin = a.person_pin AND att_date BETWEEN :att_date_start AND :att_date_end
+                WHERE person_pin = a.person_pin AND att_date = a.att_date
                     AND device_id IN (3, 14, 16)
                     AND att_time BETWEEN '12:30' AND '13:30'
                 ORDER BY att_time ASC LIMIT 1) AS rest_end
