@@ -37,7 +37,7 @@
             </el-table-column>
             <el-table-column prop="istirahat" label="Lama Istirahat" sortable width="130">
             </el-table-column>
-            <el-table-column prop="last_out" label="Keluar" sortable width="90"></el-table-column>
+            <el-table-column prop="last_out" label="Pulang" sortable width="90"></el-table-column>
             <el-table-column prop="jam_kerja_efektif" label="Jam Kerja Efektif" width="160" sortable> </el-table-column>
             <el-table-column prop="persentase" label="%" width="70" sortable></el-table-column>
         </el-table>
@@ -79,6 +79,9 @@ export default {
                 _this.absensis.forEach(a => {
                     // jam kerja
                     let masuk = moment(a.first_in, 'HH:mm:ss');
+                    if (!a.last_out) {
+                        a.last_out = '17:00:00'
+                    }
                     let keluar = moment(a.last_out, 'HH:mm:ss');
                     let duration = moment.duration(keluar.diff(masuk));
                     let seconds = duration.asSeconds();
