@@ -69,7 +69,8 @@ export default {
             _this.loading = true
             _this.keyword = ''
             let params = {
-                date: _this.filterDate,
+                date: _this.filterDate[0],
+                date_end: _this.filterDate[1],
                 api_token: USER.api_token
             }
 
@@ -77,17 +78,13 @@ export default {
                 _this.loading = false
                 _this.absensis = r.data
                 _this.absensis.forEach(a => {
-                    // jam kerja
-                    let masuk = moment(a.first_in, 'HH:mm:ss');
-                    if (!a.last_out) {
-                        a.last_out = '17:00:00'
-                    }
-                    let keluar = moment(a.last_out, 'HH:mm:ss');
-                    let duration = moment.duration(keluar.diff(masuk));
-                    let seconds = duration.asSeconds();
                     // jam istirahat
                     if (!a.rest_start) {
-                        a.rest_start = '12:00:00'
+                        if (moment(a.absence_date).day() === 5) {
+                            a.rest_start = '11:30:00'
+                        } else {
+                            a.rest_start = '12:00:00'
+                        }
                     }
                     if (!a.rest_end) {
                         a.rest_end = '13:00:00'
@@ -100,14 +97,23 @@ export default {
                     let jam_rest = Math.floor(rest_seconds/3600)
                     let menit_rest = Math.floor((rest_seconds%3600)/60)
                     let detik_rest = rest_seconds%60
-                    // jam kerja efektif
-                    let jam_kerja_efektif = seconds - rest_seconds;
-                    let jam_kerja = Math.floor(jam_kerja_efektif/3600)
-                    let menit_kerja = Math.floor((jam_kerja_efektif%3600)/60)
-                    let detik_kerja = jam_kerja_efektif%60
-                    a.jam_kerja_efektif = `${jam_kerja}:${menit_kerja}:${detik_kerja}`
-                    a.istirahat = `${jam_rest}:${menit_rest}:${detik_rest}`
-                    a.persentase = (jam_kerja_efektif / (8*36)).toFixed(2)
+
+                    // jam kerja
+                    if (a.first_in && a.last_out) {
+                        let masuk = moment(a.first_in, 'HH:mm:ss');
+                        let keluar = moment(a.last_out, 'HH:mm:ss');
+                        let duration = moment.duration(keluar.diff(masuk));
+                        let seconds = duration.asSeconds();
+                        // jam kerja efektif
+                        let jam_kerja_efektif = seconds - rest_seconds;
+                        let jam_kerja = Math.floor(jam_kerja_efektif/3600)
+                        let menit_kerja = Math.floor((jam_kerja_efektif%3600)/60)
+                        let detik_kerja = jam_kerja_efektif%60
+                        a.jam_kerja_efektif = `${jam_kerja.toString().padStart(2, '0')}:${menit_kerja.toString().padStart(2, '0')}:${detik_kerja.toString().padStart(2, '0')}`
+                        a.istirahat = `${jam_rest.toString().padStart(2, '0')}:${menit_rest.toString().padStart(2, '0')}:${detik_rest.toString().padStart(2, '0')}`
+                        let pembagi = moment(a.absence_date).day() === 5 ? 7.5*36 : 8*36
+                        a.persentase = (jam_kerja_efektif / pembagi).toFixed(2)
+                    }
                 })
             }).catch(e => {
                 _this.loading = false
