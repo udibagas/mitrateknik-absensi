@@ -51,7 +51,10 @@ class AbsensiController extends Controller
                     AND device_id IN (3, 14, 16)
                     AND att_time BETWEEN '12:30' AND '13:30'
                 ORDER BY att_time ASC LIMIT 1) AS rest_end
-        FROM att_transaction a WHERE att_date BETWEEN :att_date_start AND :att_date_end ORDER BY att_date ASC, name_var ASC";
+        FROM att_transaction a
+        WHERE att_date BETWEEN :att_date_start AND :att_date_end
+            AND person_pin != ''
+        ORDER BY att_date ASC, name_var ASC";
 
         return DB::connection('pgsql')->select($sql, [
             ':att_date_start' => $date_start,
