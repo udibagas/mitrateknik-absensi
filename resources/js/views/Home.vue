@@ -7,7 +7,7 @@
                 <el-date-picker v-model="filterDate" type="daterange" value-format="yyyy-MM-dd" range-separator="-" start-placeholder="Dari Tanggal" end-placeholder="Sampai Tanggal"> </el-date-picker>
             </el-form-item>
             <el-form-item>
-                <el-button @click="exportToExcel" type="primary"><i class="el-icon-document"></i> EXPORT KE EXCEL</el-button>
+                <el-button @click="exportToExcel" type="primary"><i class="el-icon-document"></i> {{exportLabelBtn}}</el-button>
             </el-form-item>
             <el-form-item>
                 <el-input placeholder="Cari Pegawai" prefix-icon="el-icon-search" v-model="keyword">
@@ -48,10 +48,12 @@
 <script>
 import moment from 'moment'
 import axios from 'axios'
+import exportFromJSON from 'export-from-json'
 
 export default {
     data: function() {
         return {
+            exportLabelBtn: 'EXPORT KE EXCEL',
             absensis: [],
             filterDate: [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
             keyword: '',
@@ -127,7 +129,27 @@ export default {
             // setTimeout(this.getAbsensi, 3000)
         },
         exportToExcel() {
-            console.log('OK');
+            let data = []
+            this.exportLabelBtn = 'Menyiapkan File...'
+            this.absensis.forEach(a => {
+                data.push({
+                    Tanggal: a.absence_date,
+                    Hari: a.hari,
+                    NIK: a.nik_var,
+                    Nama: a.name_var,
+                    Masuk: a.first_in || '',
+                    Jam_Istirahat: `${a.rest_start} - ${a.rest_end}`,
+                    Lama_Istirahat: a.istirahat,
+                    Pulang: a.last_out || '',
+                    Jam_Kerja_Efektif: a.jam_kerja_efektif,
+                    Persentase: a.persentase
+                })
+            })
+
+            let fileName = 'absensi.xls'
+            let exportType = 'xls'
+            exportFromJSON({ data, fileName, exportType })
+            this.exportLabelBtn = 'EXPORT KE EXCEL'
         }
     },
     mounted: function() {

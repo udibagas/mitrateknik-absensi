@@ -13,7 +13,7 @@ class CheckRole
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $role)
     {
         if (!$request->user()->admin == $role) {
             return response([
