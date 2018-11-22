@@ -21,6 +21,7 @@
             style="border-top:1px solid #eee;width:100%">
             <el-table-column type="index" width="50"></el-table-column>
             <el-table-column prop="absence_date" label="Tanggal" sortable width="100"></el-table-column>
+            <el-table-column prop="hari" label="Hari" sortable width="100"></el-table-column>
             <el-table-column prop="nik_var" label="NIK" sortable width="70"></el-table-column>
             <el-table-column prop="name_var" label="Nama" sortable>
                 <template slot-scope="scope">
@@ -54,7 +55,8 @@ export default {
             absensis: [],
             filterDate: [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
             keyword: '',
-            loading: false
+            loading: false,
+            hari: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jum\'at', 'Sabtu']
         }
     },
     watch: {
@@ -78,6 +80,8 @@ export default {
                 _this.loading = false
                 _this.absensis = r.data
                 _this.absensis.forEach(a => {
+                    // hari
+                    a.hari = _this.hari[moment(a.absence_date).day()]
                     // jam istirahat
                     if (!a.rest_start) {
                         if (moment(a.absence_date).day() === 5) {
