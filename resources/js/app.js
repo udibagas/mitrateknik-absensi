@@ -43,6 +43,7 @@ import User from './views/User'
 import PegawaiDashboard from './views/PegawaiDashboard'
 import NotFound from './views/NotFound'
 import moment from 'moment'
+import store from './store'
 
 const router = new VueRouter({
     mode: 'history',
@@ -70,6 +71,7 @@ const app = new Vue({
     el: '#app',
     components: { App },
     router,
+    store,
     data: {
         time: moment().format('DD MMM YYYY HH:mm:ss')
     },

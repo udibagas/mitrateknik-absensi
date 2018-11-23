@@ -11,6 +11,7 @@
 
     <!-- Scripts -->
     <script type="text/javascript">
+        const BASE_URL = '{{url("/")}}'
         const API_URL = '{{url("api")}}'
         const USER = {!!auth()->user()!!}
     </script>

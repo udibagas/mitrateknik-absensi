@@ -89,7 +89,7 @@
             <el-table-column prop="nik_var" label="NIK" sortable width="70"></el-table-column>
             <el-table-column prop="name_var" label="Nama" sortable>
                 <template slot-scope="scope">
-                    <a href="#" @click.prevent="$router.push({ path: `pegawai/${scope.row.nik_var}`})">
+                    <a href="#" @click.prevent="showAbsensiPegawai(scope.row)">
                         {{scope.row.name_var}}
                     </a>
                 </template>
@@ -106,6 +106,10 @@
             <el-table-column prop="jam_kerja_efektif" label="Jam Kerja Efektif" width="160" sortable> </el-table-column>
             <el-table-column prop="persentase" label="%" width="70" sortable></el-table-column>
         </el-table>
+
+        <el-dialog :visible.sync="absensiPegawaiDialog" width="95%" v-loading="loading" :close-on-click-modal="true" :show-close="true" :center="true" @close="selectedPegawai = {}">
+            <AbsensiPegawai :pegawai="selectedPegawai" :period="filterDate"/>
+        </el-dialog>
     </div>
 </template>
 
@@ -113,8 +117,13 @@
 import moment from 'moment'
 import axios from 'axios'
 import exportFromJSON from 'export-from-json'
+import AbsensiPegawai from './AbsensiPegawai'
 
 export default {
+    computed: {
+        hari() { return this.$store.state.hari }
+    },
+    components: { AbsensiPegawai },
     data: function() {
         return {
             exportLabelBtn: 'EXPORT KE EXCEL',
@@ -122,20 +131,24 @@ export default {
             filterDate: [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
             keyword: '',
             loading: false,
-            hari: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jum\'at', 'Sabtu'],
             prodPercentAvg: 0,
             prodHourAvg: 0,
             pegawaiProduktif: [],
             pegawaiTidakProduktif: [],
+            absensiPegawaiDialog: false,
+            selectedPegawai: {}
         }
     },
     watch: {
         filterDate(v, o) {
-            console.log(v);
             this.requestData()
         }
     },
     methods: {
+        showAbsensiPegawai(pegawai) {
+            this.selectedPegawai = pegawai
+            this.absensiPegawaiDialog = true
+        },
         requestData() {
             let _this = this
             _this.loading = true

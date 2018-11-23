@@ -24,6 +24,7 @@ class AbsensiController extends Controller
 
         $date_start = $request->date ? $request->date : date('Y-m-d');
         $date_end = $request->date_end ? $request->date_end : date('Y-m-d');
+        $pin = $request->person_pin ? "person_pin = '{$request->person_pin}'" : "1 = 1";
 
         $sql = "SELECT DISTINCT(att_date, person_pin) AS date_pin,
             person_pin AS nik_var,
@@ -54,6 +55,7 @@ class AbsensiController extends Controller
         FROM att_transaction a
         WHERE att_date BETWEEN :att_date_start AND :att_date_end
             AND person_pin != ''
+            AND $pin
         ORDER BY att_date ASC, name_var ASC";
 
         return DB::connection('pgsql')->select($sql, [
