@@ -10,4 +10,8 @@ class Attendance extends Model
 
     protected $table = 'att_transaction';
 
+    protected $fillable = ['att_time', 'att_datetime'];
+
+    public $timestamps = false;
+
 }

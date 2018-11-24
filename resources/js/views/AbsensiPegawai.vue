@@ -79,7 +79,6 @@ export default {
             base_url: BASE_URL,
             exportLabelBtn: 'EXPORT KE EXCEL',
             absensis: [],
-            keyword: '',
             filterDate: this.period,
             loading: false,
             prodPercentAvg: 0,

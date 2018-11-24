@@ -40,7 +40,7 @@ Vue.component('font-awesome-icon', FontAwesomeIcon)
 import App from './views/App'
 import Home from './views/Home'
 import User from './views/User'
-import PegawaiDashboard from './views/PegawaiDashboard'
+import Log from './views/Log'
 import NotFound from './views/NotFound'
 import moment from 'moment'
 import store from './store'
@@ -59,9 +59,9 @@ const router = new VueRouter({
             component: User
         },
         {
-            path: '/pegawai/:nik',
-            name: 'pegawai',
-            component: PegawaiDashboard
+            path: '/log',
+            name: 'log',
+            component: Log
         },
         { path: '*', component: NotFound }
     ]

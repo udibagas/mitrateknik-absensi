@@ -18,4 +18,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('absensi', 'Api\AbsensiController@index');
+Route::resource('attendance', 'Api\AttendanceController')->only(['index', 'update']);
 Route::resource('user', 'Api\UserController')->only(['index', 'store', 'update', 'destroy']);
