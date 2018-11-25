@@ -1,5 +1,5 @@
 <template lang="html">
-    <div class="text-danger text-center">
+    <div class="text-danger text-center" style="padding-top:100px">
         HALAMAN YANG ANDA TUJU TIDAK DITEMUKAN
     </div>
 </template>

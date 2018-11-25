@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Attendance;
+use DB;
 
 class AttendanceController extends Controller
 {
@@ -18,6 +19,21 @@ class AttendanceController extends Controller
         return Attendance::where('att_date', $request->date)
             ->where('person_pin', '!=', null)
             ->orderBy('id', 'DESC')->get();
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'person_pin' => 'required',
+            'device_id' => 'required',
+            'att_date' => 'required|date',
+            'att_time' => 'required'
+        ]);
+
+        $lastId = DB::connection('pgsql')->table('att_transaction')->max('id');
+        $input = $request->all();
+        $input['id'] = $lastId + 1;
+        return Attendance::create($input);
     }
 
     public function update(Attendance $attendance, Request $request)

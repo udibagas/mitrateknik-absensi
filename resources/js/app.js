@@ -45,26 +45,30 @@ import NotFound from './views/NotFound'
 import moment from 'moment'
 import store from './store'
 
+let routes = [{
+    path: '/home',
+    name: 'home',
+    component: Home
+}]
+
+if (USER.admin === 1) {
+    routes.push({
+        path: '/user',
+        name: 'user',
+        component: User
+    },
+    {
+        path: '/log',
+        name: 'log',
+        component: Log
+    })
+}
+
+routes.push({ path: '*', component: NotFound })
+
 const router = new VueRouter({
     mode: 'history',
-    routes: [
-        {
-            path: '/home',
-            name: 'home',
-            component: Home
-        },
-        {
-            path: '/user',
-            name: 'user',
-            component: User
-        },
-        {
-            path: '/log',
-            name: 'log',
-            component: Log
-        },
-        { path: '*', component: NotFound }
-    ]
+    routes: routes
 })
 
 const app = new Vue({

@@ -17,6 +17,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get('area', 'Api\AreaController@index');
 Route::get('absensi', 'Api\AbsensiController@index');
-Route::resource('attendance', 'Api\AttendanceController')->only(['index', 'update']);
+Route::get('person', 'Api\PersonController@index');
+Route::get('device', 'Api\DeviceController@index');
+Route::get('gate', 'Api\GateController@index');
+Route::resource('attendance', 'Api\AttendanceController')->only(['index', 'store', 'update']);
 Route::resource('user', 'Api\UserController')->only(['index', 'store', 'update', 'destroy']);
