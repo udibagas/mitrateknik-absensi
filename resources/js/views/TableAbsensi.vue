@@ -107,8 +107,8 @@
             <el-table-column prop="persentase" label="%" width="70" sortable></el-table-column>
         </el-table>
 
-        <el-dialog :visible.sync="absensiPegawaiDialog" width="95%" v-loading="loading" :close-on-click-modal="true" :show-close="true" :center="true" @close="selectedPegawai = {}">
-            <AbsensiPegawai :pegawai="selectedPegawai" :period="filterDate"/>
+        <el-dialog :visible.sync="absensiPegawaiDialog" width="95%" v-loading="loading" :close-on-click-modal="true" :show-close="true" :center="true" @close="selectedPerson = {}">
+            <AbsensiPegawai :person="selectedPerson" :period="filterDate"/>
         </el-dialog>
     </div>
 </template>
@@ -121,7 +121,8 @@ import AbsensiPegawai from './AbsensiPegawai'
 
 export default {
     computed: {
-        hari() { return this.$store.state.hari }
+        hari() { return this.$store.state.hari },
+        persons() { return this.$store.state.persons }
     },
     components: { AbsensiPegawai },
     data: function() {
@@ -136,7 +137,7 @@ export default {
             pegawaiProduktif: [],
             pegawaiTidakProduktif: [],
             absensiPegawaiDialog: false,
-            selectedPegawai: {}
+            selectedPerson: {}
         }
     },
     watch: {
@@ -145,8 +146,8 @@ export default {
         }
     },
     methods: {
-        showAbsensiPegawai(pegawai) {
-            this.selectedPegawai = pegawai
+        showAbsensiPegawai(row) {
+            this.selectedPerson = this.persons.find(p => p.pin === row.nik_var)
             this.absensiPegawaiDialog = true
         },
         requestData() {
@@ -255,6 +256,7 @@ export default {
     },
     mounted: function() {
         this.requestData()
+        this.$store.commit('getPersons');
     }
 }
 </script>

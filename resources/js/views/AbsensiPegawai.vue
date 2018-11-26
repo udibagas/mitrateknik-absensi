@@ -3,10 +3,11 @@
         <div class="row">
             <div class="col-md-3">
                 <el-card :body-style="{ padding: '14px' }">
-                    <img :src="base_url + '/img/user.png'" class="image">
+                    <img :src="base_url + '/img/user-' + person.gender.toLowerCase() + '.png'" class="image">
                     <div style="padding: 14px;" class="text-center">
-                        <h4 style="margin-bottom:2px">{{pegawai.name_var}}</h4>
-                        <span style="font-size:1.5em">{{pegawai.nik_var}}</span>
+                        <h4 style="margin-bottom:2px">{{person.name}} {{person.last_name}}</h4>
+                        <span style="font-size:1.5em">{{person.pin}}</span><br>
+                        <span>Dep. : {{person.department.name}}</span>
                         <hr>
                         <h6 class="text-center">PRODUKTIFITAS RATA - RATA</h6>
                         <hr>
@@ -70,7 +71,7 @@ import 'echarts/lib/component/title'
 
 export default {
     components: { 'v-chart': ECharts },
-    props: ['pegawai', 'period'],
+    props: ['person', 'period'],
     computed: {
         hari() { return this.$store.state.hari },
     },
@@ -125,12 +126,12 @@ export default {
         }
     },
     watch: {
-        pegawai(v, o) { this.requestData() },
+        person(v, o) { this.requestData() },
         filterDate(v, o) { this.requestData() }
     },
     methods: {
         requestData() {
-            if (this.pegawai.nik_var === undefined) {
+            if (this.person.pin === undefined) {
                 return
             }
 
@@ -141,7 +142,7 @@ export default {
                 date: _this.filterDate[0],
                 date_end: _this.filterDate[1],
                 api_token: USER.api_token,
-                person_pin: _this.pegawai.nik_var
+                person_pin: _this.person.pin
             }
 
             axios.get(API_URL + '/absensi', { params: params }).then(r => {
