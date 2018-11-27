@@ -3,11 +3,11 @@
         <div class="row">
             <div class="col-md-3">
                 <el-card :body-style="{ padding: '14px' }">
-                    <img :src="base_url + '/img/user-' + person.gender.toLowerCase() + '.png'" class="image">
+                    <img :src="base_url + '/img/user-' + (person.gender ? person.gender.toLowerCase() : '') + '.png'" class="image">
                     <div style="padding: 14px;" class="text-center">
                         <h4 style="margin-bottom:2px">{{person.name}} {{person.last_name}}</h4>
                         <span style="font-size:1.5em">{{person.pin}}</span><br>
-                        <span>Dep. : {{person.department.name}}</span>
+                        <span>Dep. : {{person.department ? person.department.name : ''}}</span>
                         <hr>
                         <h6 class="text-center">PRODUKTIFITAS RATA - RATA</h6>
                         <hr>
@@ -39,7 +39,6 @@
         </el-form>
         <el-table :data="absensis"
             stripe
-            v-loading="loading"
             style="border-top:1px solid #eee;width:100%">
             <el-table-column type="index" width="50"></el-table-column>
             <el-table-column prop="absence_date" label="Tanggal" sortable width="100"></el-table-column>
@@ -47,13 +46,20 @@
             <el-table-column prop="first_in" label="Masuk" sortable></el-table-column>
             <el-table-column label="Jam Istirahat" sortable>
                 <template slot-scope="scope">
-                    {{scope.row.rest_start}} - {{scope.row.rest_end}}<br>
+                    {{scope.row.rest_start}} - {{scope.row.rest_end}}
                 </template>
             </el-table-column>
             <el-table-column prop="istirahat" label="Lama Istirahat" sortable>
+                <template slot-scope="scope">
+                    {{secToTime(scope.row.istirahat)}}
+                </template>
             </el-table-column>
             <el-table-column prop="last_out" label="Pulang" sortable></el-table-column>
-            <el-table-column prop="jam_kerja_efektif" label="Jam Kerja Efektif" sortable> </el-table-column>
+            <el-table-column prop="jam_kerja_efektif" label="Jam Kerja Efektif" sortable>
+                <template slot-scope="scope">
+                    {{secToTime(scope.row.jam_kerja_efektif)}}
+                </template>
+            </el-table-column>
             <el-table-column prop="persentase" label="%" sortable width="70"></el-table-column>
         </el-table>
     </div>
@@ -130,6 +136,25 @@ export default {
         filterDate(v, o) { this.requestData() }
     },
     methods: {
+        getDayName(date) {
+            return this.hari[moment(date).day()]
+        },
+        getDuration(start, end) {
+            let s = moment(start, 'HH:mm:ss');
+            let e = moment(end, 'HH:mm:ss');
+            let d = moment.duration(e.diff(s));
+            return d.asSeconds();
+        },
+        secToTime(second) {
+            if (second) {
+                let h = Math.floor(second/3600)
+                let m = Math.floor((second%3600)/60)
+                let s = second%60
+                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+            }
+
+            return '';
+        },
         requestData() {
             if (this.person.pin === undefined) {
                 return
@@ -156,9 +181,7 @@ export default {
                 let totalJamKerja = 0
 
                 _this.absensis.forEach(a => {
-                    // hari
                     a.hari = _this.hari[moment(a.absence_date).day()]
-                    // jam istirahat
                     if (!a.rest_start) {
                         if (moment(a.absence_date).day() === 5) {
                             a.rest_start = '11:30:00'
@@ -170,40 +193,37 @@ export default {
                         a.rest_end = '13:00:00'
                     }
 
-                    let rest_start = moment(a.rest_start, 'HH:mm:ss');
-                    let rest_end = moment(a.rest_end, 'HH:mm:ss');
-                    let rest_duration = moment.duration(rest_end.diff(rest_start));
-                    let rest_seconds = rest_duration.asSeconds();
-                    let jam_rest = Math.floor(rest_seconds/3600)
-                    let menit_rest = Math.floor((rest_seconds%3600)/60)
-                    let detik_rest = rest_seconds%60
-                    a.istirahat = `${jam_rest.toString().padStart(2, '0')}:${menit_rest.toString().padStart(2, '0')}:${detik_rest.toString().padStart(2, '0')}`
+                    a.istirahat = _this.getDuration(a.rest_start, a.rest_end)
                     let pembagi = moment(a.absence_date).day() === 5 ? 7.5*36 : 8*36
 
-                    a.jam_kerja_efektif = '00:00:00'
-                    a.jam_kerja_efektif_raw = 0
+                    a.jam_kerja_efektif = 0
                     a.persentase = 0
 
-                    // jam kerja
                     if (a.first_in && a.last_out) {
-                        let masuk = moment(a.first_in, 'HH:mm:ss');
-                        let keluar = moment(a.last_out, 'HH:mm:ss');
-                        let duration = moment.duration(keluar.diff(masuk));
-                        let seconds = duration.asSeconds();
-                        // jam kerja efektif
-                        let jam_kerja_efektif = seconds - rest_seconds;
-                        let jam_kerja = Math.floor(jam_kerja_efektif/3600)
-                        let menit_kerja = Math.floor((jam_kerja_efektif%3600)/60)
-                        let detik_kerja = jam_kerja_efektif%60
-                        a.jam_kerja_efektif_raw = jam_kerja_efektif
-                        a.jam_kerja_efektif = `${jam_kerja.toString().padStart(2, '0')}:${menit_kerja.toString().padStart(2, '0')}:${detik_kerja.toString().padStart(2, '0')}`
-                        a.persentase = (jam_kerja_efektif / pembagi).toFixed(2)
+                        let jam_masuk_efektif = moment(a.first_in, 'HH:mm:ss').format('H') < 8
+                            ? moment('08:00:00', 'HH:mm:ss')
+                            : moment(a.first_in, 'HH:mm:ss')
+                        let jam_keluar_efektif = moment(a.last_out, 'HH:mm:ss').format('H') >= 17
+                            ? moment('17:00:00', 'HH:mm:ss')
+                            : moment(a.last_out, 'HH:mm:ss')
+                        let durasi_kerja_sec = _this.getDuration(jam_masuk_efektif, jam_keluar_efektif)
+
+                        let jam_istirahat_start_efektif = moment(a.rest_start, 'HH:mm:ss').format('H') >= 12
+                            ? moment(moment(a.absence_date).day() === 5 ? '11:30:00' : '12:00:00', 'HH:mm:ss')
+                            : moment(a.rest_start, 'HH:mm:ss')
+                        let jam_istirahat_end_efektif = moment(a.rest_end, 'HH:mm:ss').format('H') < 13
+                            ? moment('13:00:00', 'HH:mm:ss')
+                            : moment(a.rest_end, 'HH:mm:ss')
+                        let durasi_istirahat_sec = _this.getDuration(jam_istirahat_start_efektif, jam_istirahat_end_efektif)
+
+                        a.jam_kerja_efektif = durasi_kerja_sec - durasi_istirahat_sec
+                        a.persentase = (a.jam_kerja_efektif / pembagi).toFixed(2)
                         totalPersentase += parseFloat(a.persentase)
-                        totalJamKerja += jam_kerja_efektif
+                        totalJamKerja += a.jam_kerja_efektif
                     }
 
                     _this.chartOption.xAxis.data.push(a.absence_date + '\n' + a.hari)
-                    _this.chartOption.series[0].data.push(a.jam_kerja_efektif_raw > 0 ? (a.jam_kerja_efektif_raw/3600).toFixed(2) : 0)
+                    _this.chartOption.series[0].data.push(a.jam_kerja_efektif > 0 ? (a.jam_kerja_efektif/3600).toFixed(2) : 0)
                 })
 
                 if (totalPersentase > 0) {
@@ -221,14 +241,15 @@ export default {
         },
         exportToExcel() {
             let data = []
-            this.exportLabelBtn = 'Menyiapkan File...'
-            this.absensis.forEach(a => {
+            let _this = this
+            _this.exportLabelBtn = 'Menyiapkan File...'
+            _this.absensis.forEach(a => {
                 data.push({
                     Tanggal: a.absence_date,
                     Hari: a.hari,
                     Masuk: a.first_in || '',
                     Jam_Istirahat: `${a.rest_start} - ${a.rest_end}`,
-                    Lama_Istirahat: a.istirahat,
+                    Lama_Istirahat: _this.secToTime(a.istirahat),
                     Pulang: a.last_out || '',
                     Jam_Kerja_Efektif: a.jam_kerja_efektif,
                     Persentase: a.persentase

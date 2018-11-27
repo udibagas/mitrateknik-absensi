@@ -34,7 +34,7 @@
                         <tbody>
                             <tr v-for="p in pegawaiProduktif">
                                 <td>{{p.name_var}}</td>
-                                <td class="text-center">{{(p.jam_kerja_efektif/3600).toFixed()}}</td>
+                                <td class="text-center">{{ secToTime(p.jam_kerja_efektif) }}</td>
                                 <td class="text-center">{{p.persentase}}</td>
                             </tr>
                         </tbody>
@@ -57,7 +57,7 @@
                         <tbody>
                             <tr v-for="p in pegawaiTidakProduktif">
                                 <td>{{p.name_var}}</td>
-                                <td class="text-center">{{(p.jam_kerja_efektif/3600).toFixed()}}</td>
+                                <td class="text-center">{{ secToTime(p.jam_kerja_efektif) }}</td>
                                 <td class="text-center">{{p.persentase}}</td>
                             </tr>
                         </tbody>
@@ -79,13 +79,23 @@
                 </el-input>
             </el-form-item>
         </el-form>
-        <el-table :data="absensis.filter(a => a.nik_var.includes(keyword) || a.name_var.toLowerCase().includes(keyword.toLowerCase()))"
+        <el-table :data="filteredData"
             stripe
             style="border-top:1px solid #eee;width:100%">
             <el-table-column type="index" width="50"></el-table-column>
             <el-table-column prop="absence_date" label="Tanggal" sortable width="100"></el-table-column>
-            <el-table-column prop="hari" label="Hari" sortable width="100"></el-table-column>
-            <el-table-column prop="nik_var" label="NIK" sortable width="70"></el-table-column>
+            <el-table-column prop="hari" label="Hari" sortable width="100">
+                <template slot-scope="scope">
+                    {{ getDayName(scope.row.absence_date) }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="nik_var" label="NIK" sortable width="70">
+                <template slot-scope="scope">
+                    <a href="#" @click.prevent="showAbsensiPegawai(scope.row)">
+                        {{scope.row.nik_var}}
+                    </a>
+                </template>
+            </el-table-column>
             <el-table-column prop="name_var" label="Nama" sortable>
                 <template slot-scope="scope">
                     <a href="#" @click.prevent="showAbsensiPegawai(scope.row)">
@@ -100,17 +110,20 @@
                 </template>
             </el-table-column>
             <el-table-column prop="istirahat" label="Lama Istirahat" sortable width="130">
+                <template slot-scope="scope">
+                    {{ secToTime(scope.row.istirahat) }}
+                </template>
             </el-table-column>
             <el-table-column prop="last_out" label="Pulang" sortable width="90"></el-table-column>
             <el-table-column prop="jam_kerja_efektif" label="Jam Kerja Efektif" width="160" sortable>
                 <template slot-scope="scope">
-                    {{(scope.row.jam_kerja_efektif/3600).toFixed(2)}}
+                    {{ secToTime(scope.row.jam_kerja_efektif) }}
                 </template>
             </el-table-column>
             <el-table-column prop="persentase" label="%" width="70" sortable></el-table-column>
         </el-table>
 
-        <el-dialog :visible.sync="absensiPegawaiDialog" width="95%" v-loading="loading" :close-on-click-modal="true" :show-close="true" :center="true" @close="selectedPerson = {}">
+        <el-dialog :visible.sync="absensiPegawaiDialog" width="95%" :center="true" @close="selectedPerson = {}">
             <AbsensiPegawai :person="selectedPerson" :period="filterDate"/>
         </el-dialog>
     </div>
@@ -123,11 +136,23 @@ import exportFromJSON from 'export-from-json'
 import AbsensiPegawai from './AbsensiPegawai'
 
 export default {
+    components: { AbsensiPegawai },
     computed: {
         hari() { return this.$store.state.hari },
-        persons() { return this.$store.state.persons }
+        persons() { return this.$store.state.persons },
+        sortedData() {
+            return  this.absensis.sort((a,b) => (a.jam_kerja_efektif > b.jam_kerja_efektif) ? 1 : ((a.jam_kerja_efektif < b.jam_kerja_efektif) ? -1 : 0))
+        },
+        pegawaiProduktif() {
+            return this.sortedData.filter(s => s.jam_kerja_efektif >= (8*3600)).slice(-5).reverse()
+        },
+        pegawaiTidakProduktif() {
+            return this.sortedData.filter(s => s.jam_kerja_efektif < (8*3600)).slice(0, 5)
+        },
+        filteredData() {
+            return this.absensis.filter(a => a.nik_var.includes(this.keyword) || a.name_var.toLowerCase().includes(this.keyword.toLowerCase()))
+        }
     },
-    components: { AbsensiPegawai },
     data: function() {
         return {
             exportLabelBtn: 'EXPORT KE EXCEL',
@@ -137,10 +162,8 @@ export default {
             loading: false,
             prodPercentAvg: 0,
             prodHourAvg: 0,
-            pegawaiProduktif: [],
-            pegawaiTidakProduktif: [],
             absensiPegawaiDialog: false,
-            selectedPerson: {}
+            selectedPerson: {},
         }
     },
     watch: {
@@ -149,6 +172,25 @@ export default {
         }
     },
     methods: {
+        getDayName(date) {
+            return this.hari[moment(date).day()]
+        },
+        getDuration(start, end) {
+            let s = moment(start, 'HH:mm:ss');
+            let e = moment(end, 'HH:mm:ss');
+            let d = moment.duration(e.diff(s));
+            return d.asSeconds();
+        },
+        secToTime(second) {
+            if (second) {
+                let h = Math.floor(second/3600)
+                let m = Math.floor((second%3600)/60)
+                let s = second%60
+                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+            }
+
+            return '';
+        },
         showAbsensiPegawai(row) {
             this.selectedPerson = this.persons.find(p => p.pin === row.nik_var)
             this.absensiPegawaiDialog = true
@@ -169,9 +211,6 @@ export default {
                 let totalJamKerja = 0
 
                 _this.absensis.forEach(a => {
-                    // hari
-                    a.hari = _this.hari[moment(a.absence_date).day()]
-                    // jam istirahat
                     if (!a.rest_start) {
                         if (moment(a.absence_date).day() === 5) {
                             a.rest_start = '11:30:00'
@@ -183,21 +222,12 @@ export default {
                         a.rest_end = '13:00:00'
                     }
 
-                    let rest_start = moment(a.rest_start, 'HH:mm:ss');
-                    let rest_end = moment(a.rest_end, 'HH:mm:ss');
-                    let rest_duration = moment.duration(rest_end.diff(rest_start));
-                    let rest_seconds = rest_duration.asSeconds();
-                    let jam_rest = Math.floor(rest_seconds/3600)
-                    let menit_rest = Math.floor((rest_seconds%3600)/60)
-                    let detik_rest = rest_seconds%60
-                    a.istirahat = `${jam_rest.toString().padStart(2, '0')}:${menit_rest.toString().padStart(2, '0')}:${detik_rest.toString().padStart(2, '0')}`
+                    a.istirahat = _this.getDuration(a.rest_start, a.rest_end)
                     let pembagi = moment(a.absence_date).day() === 5 ? 7.5*36 : 8*36
 
                     a.jam_kerja_efektif = 0
-                    a.jam_kerja_efektif_raw = 0
                     a.persentase = 0
 
-                    // jam kerja
                     if (a.first_in && a.last_out) {
                         let jam_masuk_efektif = moment(a.first_in, 'HH:mm:ss').format('H') < 8
                             ? moment('08:00:00', 'HH:mm:ss')
@@ -205,17 +235,15 @@ export default {
                         let jam_keluar_efektif = moment(a.last_out, 'HH:mm:ss').format('H') >= 17
                             ? moment('17:00:00', 'HH:mm:ss')
                             : moment(a.last_out, 'HH:mm:ss')
-                        let durasi_kerja = moment.duration(jam_keluar_efektif.diff(jam_masuk_efektif))
-                        let durasi_kerja_sec = durasi_kerja.asSeconds()
+                        let durasi_kerja_sec = _this.getDuration(jam_masuk_efektif, jam_keluar_efektif)
 
-                        let jam_istirahat_start_efektif = rest_start.format('H') >= 12
+                        let jam_istirahat_start_efektif = moment(a.rest_start, 'HH:mm:ss').format('H') >= 12
                             ? moment(moment(a.absence_date).day() === 5 ? '11:30:00' : '12:00:00', 'HH:mm:ss')
-                            : rest_start
-                        let jam_istirahat_end_efektif = rest_end.format('H') < 13
+                            : moment(a.rest_start, 'HH:mm:ss')
+                        let jam_istirahat_end_efektif = moment(a.rest_end, 'HH:mm:ss').format('H') < 13
                             ? moment('13:00:00', 'HH:mm:ss')
-                            : rest_end
-                        let durasi_istirahat = moment.duration(jam_istirahat_end_efektif.diff(jam_istirahat_start_efektif))
-                        let durasi_istirahat_sec = durasi_istirahat.asSeconds()
+                            : moment(a.rest_end, 'HH:mm:ss')
+                        let durasi_istirahat_sec = _this.getDuration(jam_istirahat_start_efektif, jam_istirahat_end_efektif)
 
                         a.jam_kerja_efektif = durasi_kerja_sec - durasi_istirahat_sec
                         a.persentase = (a.jam_kerja_efektif / pembagi).toFixed(2)
@@ -232,9 +260,6 @@ export default {
                     _this.prodHourAvg = (totalJamKerja/3600/_this.absensis.length).toFixed(2)
                 }
 
-                let sorted = _this.absensis.sort((a,b) => (a.jam_kerja_efektif > b.jam_kerja_efektif) ? 1 : ((a.jam_kerja_efektif < b.jam_kerja_efektif) ? -1 : 0))
-                _this.pegawaiProduktif = sorted.filter(s => s.jam_kerja_efektif >= (8*3600)).slice(-5).reverse()
-                _this.pegawaiTidakProduktif = sorted.filter(s => s.jam_kerja_efektif < (8*3600)).slice(0, 5)
             }).catch(e => {
                 _this.loading = false
                 console.log(e);
@@ -245,15 +270,16 @@ export default {
         exportToExcel() {
             let data = []
             this.exportLabelBtn = 'Menyiapkan File...'
-            this.absensis.forEach(a => {
+            let _this = this
+            _this.absensis.forEach(a => {
                 data.push({
                     Tanggal: a.absence_date,
-                    Hari: a.hari,
+                    Hari: _this.getDayName(a.absence_date),
                     NIK: a.nik_var,
                     Nama: a.name_var,
                     Masuk: a.first_in || '',
                     Jam_Istirahat: `${a.rest_start} - ${a.rest_end}`,
-                    Lama_Istirahat: a.istirahat,
+                    Lama_Istirahat: _this.secToTime(a.istirahat),
                     Pulang: a.last_out || '',
                     Jam_Kerja_Efektif: (a.jam_kerja_efektif/3600).toFixed(),
                     Persentase: a.persentase
