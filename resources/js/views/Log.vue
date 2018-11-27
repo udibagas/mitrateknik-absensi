@@ -178,6 +178,8 @@ export default {
                 _this.loading = false
                 console.log(e);
             })
+
+            setTimeout(this.requestData, 5000)
         },
         exportToExcel() {
             let data = []

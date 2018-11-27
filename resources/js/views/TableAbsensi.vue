@@ -153,7 +153,6 @@ export default {
         requestData() {
             let _this = this
             _this.loading = true
-            _this.keyword = ''
             let params = {
                 date: _this.filterDate[0],
                 date_end: _this.filterDate[1],
@@ -228,7 +227,7 @@ export default {
                 console.log(e);
             })
 
-            // setTimeout(this.getAbsensi, 3000)
+            setTimeout(this.requestData, 5000)
         },
         exportToExcel() {
             let data = []
