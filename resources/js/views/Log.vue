@@ -19,7 +19,6 @@
         <el-table
         :data="logs.filter(a => a.person_pin.includes(keyword) || a.person_name.toLowerCase().includes(keyword.toLowerCase()))"
         stripe
-        v-loading="loading"
         style="border-top:1px solid #eee;width:100%">
 
             <el-table-column type="index" width="50"></el-table-column>

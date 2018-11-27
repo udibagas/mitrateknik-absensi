@@ -81,7 +81,6 @@
         </el-form>
         <el-table :data="absensis.filter(a => a.nik_var.includes(keyword) || a.name_var.toLowerCase().includes(keyword.toLowerCase()))"
             stripe
-            v-loading="loading"
             style="border-top:1px solid #eee;width:100%">
             <el-table-column type="index" width="50"></el-table-column>
             <el-table-column prop="absence_date" label="Tanggal" sortable width="100"></el-table-column>
