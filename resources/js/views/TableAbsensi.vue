@@ -34,7 +34,7 @@
                         <tbody>
                             <tr v-for="p in pegawaiProduktif">
                                 <td>{{p.name_var}}</td>
-                                <td class="text-center">{{p.jam_kerja_efektif}}</td>
+                                <td class="text-center">{{(p.jam_kerja_efektif/3600).toFixed()}}</td>
                                 <td class="text-center">{{p.persentase}}</td>
                             </tr>
                         </tbody>
@@ -57,7 +57,7 @@
                         <tbody>
                             <tr v-for="p in pegawaiTidakProduktif">
                                 <td>{{p.name_var}}</td>
-                                <td class="text-center">{{p.jam_kerja_efektif}}</td>
+                                <td class="text-center">{{(p.jam_kerja_efektif/3600).toFixed()}}</td>
                                 <td class="text-center">{{p.persentase}}</td>
                             </tr>
                         </tbody>
@@ -96,13 +96,17 @@
             <el-table-column prop="first_in" label="Masuk" sortable width="90"></el-table-column>
             <el-table-column label="Jam Istirahat" sortable width="150">
                 <template slot-scope="scope">
-                    {{scope.row.rest_start}} - {{scope.row.rest_end}}<br>
+                    {{scope.row.rest_start}} - {{scope.row.rest_end}}
                 </template>
             </el-table-column>
             <el-table-column prop="istirahat" label="Lama Istirahat" sortable width="130">
             </el-table-column>
             <el-table-column prop="last_out" label="Pulang" sortable width="90"></el-table-column>
-            <el-table-column prop="jam_kerja_efektif" label="Jam Kerja Efektif" width="160" sortable> </el-table-column>
+            <el-table-column prop="jam_kerja_efektif" label="Jam Kerja Efektif" width="160" sortable>
+                <template slot-scope="scope">
+                    {{(scope.row.jam_kerja_efektif/3600).toFixed(2)}}
+                </template>
+            </el-table-column>
             <el-table-column prop="persentase" label="%" width="70" sortable></el-table-column>
         </el-table>
 
@@ -213,23 +217,24 @@ export default {
                         let durasi_istirahat = moment.duration(jam_istirahat_end_efektif.diff(jam_istirahat_start_efektif))
                         let durasi_istirahat_sec = durasi_istirahat.asSeconds()
 
-                        let jam_kerja_efektif = durasi_kerja_sec - durasi_istirahat_sec
-                        a.persentase = (jam_kerja_efektif / pembagi).toFixed(2)
-                        a.jam_kerja_efektif = (jam_kerja_efektif/3600).toFixed(2)
+                        a.jam_kerja_efektif = durasi_kerja_sec - durasi_istirahat_sec
+                        a.persentase = (a.jam_kerja_efektif / pembagi).toFixed(2)
                         totalPersentase += parseFloat(a.persentase)
-                        totalJamKerja += jam_kerja_efektif
+                        totalJamKerja += a.jam_kerja_efektif
                     }
                 })
 
                 if (totalPersentase > 0) {
                     _this.prodPercentAvg = (totalPersentase/_this.absensis.length).toFixed(2)
                 }
+
                 if (totalJamKerja > 0) {
                     _this.prodHourAvg = (totalJamKerja/3600/_this.absensis.length).toFixed(2)
                 }
-                let sorted = _this.absensis.sort((a,b) => (a.jam_kerja_efektif_raw > b.jam_kerja_efektif_raw) ? 1 : ((a.jam_kerja_efektif_raw < b.jam_kerja_efektif_raw) ? -1 : 0))
-                _this.pegawaiProduktif = sorted.filter(s => s.jam_kerja_efektif_raw >= (8*3600)).slice(-5).reverse()
-                _this.pegawaiTidakProduktif = sorted.filter(s => s.jam_kerja_efektif_raw < (8*3600)).slice(0, 5)
+
+                let sorted = _this.absensis.sort((a,b) => (a.jam_kerja_efektif > b.jam_kerja_efektif) ? 1 : ((a.jam_kerja_efektif < b.jam_kerja_efektif) ? -1 : 0))
+                _this.pegawaiProduktif = sorted.filter(s => s.jam_kerja_efektif >= (8*3600)).slice(-5).reverse()
+                _this.pegawaiTidakProduktif = sorted.filter(s => s.jam_kerja_efektif < (8*3600)).slice(0, 5)
             }).catch(e => {
                 _this.loading = false
                 console.log(e);
@@ -250,7 +255,7 @@ export default {
                     Jam_Istirahat: `${a.rest_start} - ${a.rest_end}`,
                     Lama_Istirahat: a.istirahat,
                     Pulang: a.last_out || '',
-                    Jam_Kerja_Efektif: a.jam_kerja_efektif,
+                    Jam_Kerja_Efektif: (a.jam_kerja_efektif/3600).toFixed(),
                     Persentase: a.persentase
                 })
             })
