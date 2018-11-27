@@ -45,11 +45,18 @@ import NotFound from './views/NotFound'
 import moment from 'moment'
 import store from './store'
 
-let routes = [{
-    path: '/home',
-    name: 'home',
-    component: Home
-}]
+let routes = [
+    {
+        path: '/',
+        name: '/',
+        component: Home
+    },
+    {
+        path: '/home',
+        name: 'home',
+        component: Home
+    }
+]
 
 if (USER.admin === 1) {
     routes.push({
