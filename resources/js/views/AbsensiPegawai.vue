@@ -251,12 +251,12 @@ export default {
                     Jam_Istirahat: `${a.rest_start} - ${a.rest_end}`,
                     Lama_Istirahat: _this.secToTime(a.istirahat),
                     Pulang: a.last_out || '',
-                    Jam_Kerja_Efektif: a.jam_kerja_efektif,
+                    Jam_Kerja_Efektif: _this.secToTime(a.jam_kerja_efektif),
                     Persentase: a.persentase
                 })
             })
 
-            let fileName = 'absensi-' + this.pegawai.nik_var +'.xls'
+            let fileName = 'absensi-' + this.person.pin +'.xls'
             let exportType = 'xls'
             exportFromJSON({ data, fileName, exportType })
             this.exportLabelBtn = 'EXPORT KE EXCEL'

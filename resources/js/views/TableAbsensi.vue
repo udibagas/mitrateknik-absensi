@@ -281,7 +281,7 @@ export default {
                     Jam_Istirahat: `${a.rest_start} - ${a.rest_end}`,
                     Lama_Istirahat: _this.secToTime(a.istirahat),
                     Pulang: a.last_out || '',
-                    Jam_Kerja_Efektif: (a.jam_kerja_efektif/3600).toFixed(),
+                    Jam_Kerja_Efektif: _this.secToTime(a.jam_kerja_efektif),
                     Persentase: a.persentase
                 })
             })
