@@ -44,7 +44,6 @@
         width="500px"
         :close-on-click-modal="true"
         :show-close="true"
-        v-loading="loading"
         :title="row_id ? 'Edit Absensi' : 'Input Absensi'">
             <el-alert type="error" title="ERROR"
                 :description="error.message + '\n' + error.file + ':' + error.line"
@@ -178,7 +177,7 @@ export default {
                 console.log(e);
             })
 
-            setTimeout(this.requestData, 5000)
+            setTimeout(this.requestData, 10000)
         },
         exportToExcel() {
             let data = []

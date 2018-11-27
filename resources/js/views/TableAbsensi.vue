@@ -189,24 +189,33 @@ export default {
                     a.istirahat = `${jam_rest.toString().padStart(2, '0')}:${menit_rest.toString().padStart(2, '0')}:${detik_rest.toString().padStart(2, '0')}`
                     let pembagi = moment(a.absence_date).day() === 5 ? 7.5*36 : 8*36
 
-                    a.jam_kerja_efektif = '00:00:00'
+                    a.jam_kerja_efektif = 0
                     a.jam_kerja_efektif_raw = 0
                     a.persentase = 0
 
                     // jam kerja
                     if (a.first_in && a.last_out) {
-                        let masuk = moment(a.first_in, 'HH:mm:ss');
-                        let keluar = moment(a.last_out, 'HH:mm:ss');
-                        let duration = moment.duration(keluar.diff(masuk));
-                        let seconds = duration.asSeconds();
-                        // jam kerja efektif
-                        let jam_kerja_efektif = seconds - rest_seconds;
-                        let jam_kerja = Math.floor(jam_kerja_efektif/3600)
-                        let menit_kerja = Math.floor((jam_kerja_efektif%3600)/60)
-                        let detik_kerja = jam_kerja_efektif%60
-                        a.jam_kerja_efektif_raw = jam_kerja_efektif
-                        a.jam_kerja_efektif = `${jam_kerja.toString().padStart(2, '0')}:${menit_kerja.toString().padStart(2, '0')}:${detik_kerja.toString().padStart(2, '0')}`
+                        let jam_masuk_efektif = moment(a.first_in, 'HH:mm:ss').format('H') < 8
+                            ? moment('08:00:00', 'HH:mm:ss')
+                            : moment(a.first_in, 'HH:mm:ss')
+                        let jam_keluar_efektif = moment(a.last_out, 'HH:mm:ss').format('H') >= 17
+                            ? moment('17:00:00', 'HH:mm:ss')
+                            : moment(a.last_out, 'HH:mm:ss')
+                        let durasi_kerja = moment.duration(jam_keluar_efektif.diff(jam_masuk_efektif))
+                        let durasi_kerja_sec = durasi_kerja.asSeconds()
+
+                        let jam_istirahat_start_efektif = rest_start.format('H') >= 12
+                            ? moment(moment(a.absence_date).day() === 5 ? '11:30:00' : '12:00:00', 'HH:mm:ss')
+                            : rest_start
+                        let jam_istirahat_end_efektif = rest_end.format('H') < 13
+                            ? moment('13:00:00', 'HH:mm:ss')
+                            : rest_end
+                        let durasi_istirahat = moment.duration(jam_istirahat_end_efektif.diff(jam_istirahat_start_efektif))
+                        let durasi_istirahat_sec = durasi_istirahat.asSeconds()
+
+                        let jam_kerja_efektif = durasi_kerja_sec - durasi_istirahat_sec
                         a.persentase = (jam_kerja_efektif / pembagi).toFixed(2)
+                        a.jam_kerja_efektif = (jam_kerja_efektif/3600).toFixed(2)
                         totalPersentase += parseFloat(a.persentase)
                         totalJamKerja += jam_kerja_efektif
                     }
@@ -226,7 +235,7 @@ export default {
                 console.log(e);
             })
 
-            setTimeout(this.requestData, 5000)
+            setTimeout(this.requestData, 10000)
         },
         exportToExcel() {
             let data = []
