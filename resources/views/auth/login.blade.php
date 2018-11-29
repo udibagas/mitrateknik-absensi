@@ -1,15 +1,16 @@
 @extends('layouts.login')
 
 @section('content')
-<div class="row justify-content-center" style="margin-top:200px;">
-    <div class="col-md-4 text-center">
-        <img src="{{asset('img/logo.jpeg')}}" alt="" style="height:40px"><br>
-        <span style="font-size:30px;">MITRA TEKNIK</span>
-        <form method="POST" action="{{ route('login') }}" style="margin-top:30px;">
+<div class="row justify-content-center">
+    <div class="col-md-4 text-center" style="margin-top:120px;background-color:rgba(0, 0, 0, 0.7);padding:20px;">
+        <form method="POST" action="{{ route('login') }}">
+            <img src="{{asset('img/logo-kai.png')}}" alt="" style="height:120px"><br>
+            <span style="font-size:30px;color:#fff;">UPT BALAI YASA TEGAL</span>
+            <br><br>
             @csrf
 
             <div class="form-group">
-                <input id="email" type="text" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus>
+                <input id="email" type="text" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus placeholder="Username">
 
                 @if ($errors->has('email'))
                     <span class="invalid-feedback" role="alert">
@@ -19,7 +20,7 @@
             </div>
 
             <div class="form-group">
-                <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
+                <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required placeholder="Password">
 
                 @if ($errors->has('password'))
                     <span class="invalid-feedback" role="alert">
@@ -35,7 +36,7 @@
                 </button>
             </div>
             <br><br>
-            <div class="text-muted">&copy; {{date('Y')}} - MitraTeknik</div>
+            <div class="text-muted">&copy; {{date('Y')}} - <a href="http://www.mitrateknik.co.id/">MitraTeknik</a></div>
         </form>
     </div>
 </div>

@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>MITRA TEKNIK</title>
+    <title>KAI - UPT BALAI YASA TEGAL</title>
 
     <!-- Scripts -->
     <script type="text/javascript">
@@ -25,9 +25,9 @@
         <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    <img src="{{ asset('img/logo.jpeg')}}" alt="" class="img-responsive" style="height:40px;margin-right:5px;">
-                    <span style="font-size:20px;">
-                    MITRATEKNIK
+                    <img src="{{ asset('img/logo-kai.jpg')}}" alt="" class="img-responsive" style="height:40px;margin-right:5px;">
+                    <span style="font-size:20px;margin-left:15px;">
+                    UPT BALAI YASA TEGAL
                     </span>
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">

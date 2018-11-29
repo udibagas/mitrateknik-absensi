@@ -7,12 +7,21 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>MITRA TEKNIK</title>
+    <title>KAI - UPT BALAI YASA TEGAL</title>
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+
+    <style media="screen">
+        body {
+            background-image: url('{{asset('/img/bg.jpg')}}');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
 </head>
-<body>
+<body style="background">
     <div id="app" class="container">
         @yield('content')
     </div>
