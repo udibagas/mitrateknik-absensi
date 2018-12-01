@@ -5,7 +5,7 @@
     <div class="col-md-4 text-center" style="margin-top:120px;background-color:rgba(0, 0, 0, 0.7);padding:20px;">
         <form method="POST" action="{{ route('login') }}">
             <img src="{{asset('img/logo-kai.png')}}" alt="" style="height:120px"><br>
-            <span style="font-size:30px;color:#fff;">UPT BALAI YASA TEGAL</span>
+            <span style="font-size:25px;color:#fff;">UPT BALAI YASA TEGAL</span>
             <br><br>
             @csrf
 

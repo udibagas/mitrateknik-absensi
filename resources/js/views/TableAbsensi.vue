@@ -164,11 +164,14 @@ export default {
             prodHourAvg: 0,
             absensiPegawaiDialog: false,
             selectedPerson: {},
+            requestInterval: null
         }
     },
     watch: {
         filterDate(v, o) {
+            clearInterval(this.requestInterval)
             this.requestData()
+            this.requestInterval = setInterval(this.requestData, 10000)
         }
     },
     methods: {
@@ -264,8 +267,6 @@ export default {
                 _this.loading = false
                 console.log(e);
             })
-
-            setTimeout(this.requestData, 10000)
         },
         exportToExcel() {
             let data = []
@@ -294,7 +295,11 @@ export default {
     },
     mounted: function() {
         this.requestData()
+        this.requestInterval = setInterval(this.requestData, 10000)
         this.$store.commit('getPersons');
+    },
+    destroyed: function() {
+        clearInterval(this.requestInterval)
     }
 }
 </script>

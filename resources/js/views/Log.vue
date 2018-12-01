@@ -124,12 +124,15 @@ export default {
             att_date: '',
             att_time: '',
             row_id: '',
-            loading: false
+            loading: false,
+            requestInterval: null
         }
     },
     watch: {
         date(v, o) {
+            clearInterval(this.requestInterval)
             this.requestData()
+            this.requestInterval = setInterval(this.requestData, 5000)
         },
         person_pin(v, o) {
             if (v) {
@@ -176,8 +179,6 @@ export default {
                 _this.loading = false
                 console.log(e);
             })
-
-            setTimeout(this.requestData, 5000)
         },
         exportToExcel() {
             let data = []
@@ -287,8 +288,12 @@ export default {
     },
     mounted: function() {
         this.requestData()
+        this.requestInterval = setInterval(this.requestData, 5000)
         this.$store.commit('getGates')
         this.$store.commit('getPersons')
+    },
+    destroyed: function() {
+        clearInterval(this.requestInterval)
     }
 }
 </script>
