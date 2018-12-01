@@ -125,14 +125,16 @@ export default {
             att_time: '',
             row_id: '',
             loading: false,
-            requestInterval: null
+            requestInterval: null,
+            requestIntervalTime: 5000,
+            isRequesting: false
         }
     },
     watch: {
         date(v, o) {
             clearInterval(this.requestInterval)
             this.requestData()
-            this.requestInterval = setInterval(this.requestData, 5000)
+            this.requestInterval = setInterval(this.requestData, this.requestIntervalTime)
         },
         person_pin(v, o) {
             if (v) {
@@ -169,14 +171,21 @@ export default {
             this.formDialog = true
         },
         requestData() {
+            if (this.isRequesting) {
+                return
+            }
+
             let _this = this
             _this.loading = true
+            _this.isRequesting = true
             let params = { api_token: USER.api_token, date: _this.date }
             axios.get(API_URL + '/attendance', { params: params }).then(function(r) {
                 _this.loading = false
+                _this.isRequesting = false
                 _this.logs = r.data
             }).catch(function(e) {
                 _this.loading = false
+                _this.isRequesting = false
                 console.log(e);
             })
         },
@@ -288,7 +297,7 @@ export default {
     },
     mounted: function() {
         this.requestData()
-        this.requestInterval = setInterval(this.requestData, 5000)
+        this.requestInterval = setInterval(this.requestData, this.requestIntervalTime)
         this.$store.commit('getGates')
         this.$store.commit('getPersons')
     },

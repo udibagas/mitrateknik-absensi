@@ -164,14 +164,16 @@ export default {
             prodHourAvg: 0,
             absensiPegawaiDialog: false,
             selectedPerson: {},
-            requestInterval: null
+            requestInterval: null,
+            requestIntervalTime: 10000,
+            isRequesting: false
         }
     },
     watch: {
         filterDate(v, o) {
             clearInterval(this.requestInterval)
             this.requestData()
-            this.requestInterval = setInterval(this.requestData, 10000)
+            this.requestInterval = setInterval(this.requestData, this.requestIntervalTime)
         }
     },
     methods: {
@@ -199,6 +201,10 @@ export default {
             this.absensiPegawaiDialog = true
         },
         requestData() {
+            if (this.isRequesting) {
+                return
+            }
+
             let _this = this
             _this.loading = true
             let params = {
@@ -209,6 +215,7 @@ export default {
 
             axios.get(API_URL + '/absensi', { params: params }).then(r => {
                 _this.loading = false
+                _this.isRequesting = false
                 _this.absensis = r.data
                 let totalPersentase = 0
                 let totalJamKerja = 0
@@ -265,6 +272,7 @@ export default {
 
             }).catch(e => {
                 _this.loading = false
+                _this.isRequesting = false
                 console.log(e);
             })
         },
@@ -295,7 +303,7 @@ export default {
     },
     mounted: function() {
         this.requestData()
-        this.requestInterval = setInterval(this.requestData, 10000)
+        this.requestInterval = setInterval(this.requestData, this.requestIntervalTime)
         this.$store.commit('getPersons');
     },
     destroyed: function() {
