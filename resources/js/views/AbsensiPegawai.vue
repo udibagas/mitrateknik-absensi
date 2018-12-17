@@ -218,9 +218,16 @@ export default {
 
                         let durasi_kerja_sec = _this.getDuration(jam_masuk_efektif, jam_keluar_efektif)
 
-                        let jam_istirahat_start_efektif = moment(a.rest_start, 'HH:mm:ss').format('H') >= 12
-                            ? moment(moment(a.absence_date).day() === 5 ? '11:30:00' : '12:00:00', 'HH:mm:ss')
+                        let jam_istirahat_start_efektif = moment(a.rest_start, 'HH:mm:ss') >= moment('12:00', 'HH:mm')
+                            ? moment('12:00:00', 'HH:mm:ss')
                             : moment(a.rest_start, 'HH:mm:ss')
+
+                        if (moment(a.absence_date).day() === 5) {
+                            jam_istirahat_start_efektif = moment(a.rest_start, 'HH:mm:ss') >= moment('11:30', 'HH:mm')
+                            ? moment('11:30:00', 'HH:mm:ss')
+                            : moment(a.rest_start, 'HH:mm:ss')
+                        }
+
                         let jam_istirahat_end_efektif = moment(a.rest_end, 'HH:mm:ss').format('H') < 13
                             ? moment('13:00:00', 'HH:mm:ss')
                             : moment(a.rest_end, 'HH:mm:ss')
