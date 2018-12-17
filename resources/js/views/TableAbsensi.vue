@@ -233,7 +233,7 @@ export default {
                     }
 
                     a.istirahat = _this.getDuration(a.rest_start, a.rest_end)
-                    let pembagi = moment(a.absence_date).day() === 5 ? 7.5*36 : 8*36
+                    let pembagi = moment(a.absence_date).day() === 5 ? 7*36 : 8*36
 
                     a.jam_kerja_efektif = 0
                     a.persentase = 0
@@ -242,9 +242,20 @@ export default {
                         let jam_masuk_efektif = moment(a.first_in, 'HH:mm:ss').format('H') < 8
                             ? moment('08:00:00', 'HH:mm:ss')
                             : moment(a.first_in, 'HH:mm:ss')
+                        
                         let jam_keluar_efektif = moment(a.last_out, 'HH:mm:ss').format('H') >= 17
                             ? moment('17:00:00', 'HH:mm:ss')
                             : moment(a.last_out, 'HH:mm:ss')
+                        
+                        if (moment(a.absence_date).day() === 5) {
+                            jam_masuk_efektif = moment(a.first_in, 'HH:mm:ss').format('H') < 7
+                                ? moment('07:00:00', 'HH:mm:ss')
+                                : moment(a.first_in, 'HH:mm:ss')
+                            jam_keluar_efektif = moment(a.last_out, 'HH:mm:ss') >= moment('15:30', 'HH:mm')
+                                ? moment('15:30:00', 'HH:mm:ss')
+                                : moment(a.last_out, 'HH:mm:ss')
+                        }
+
                         let durasi_kerja_sec = _this.getDuration(jam_masuk_efektif, jam_keluar_efektif)
 
                         let jam_istirahat_start_efektif = moment(a.rest_start, 'HH:mm:ss').format('H') >= 12
