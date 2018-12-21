@@ -123,7 +123,9 @@ export default {
                         show: true,
                         position: 'top',
                         formatter: function(v) {
-                            return v.value + ' jam\n' + (v.value/8*100).toFixed(2) + '%'
+                            let tgl = v.name.split("\n")[0];
+                            let pembagi = moment(tgl).day() === 5 ? 7 : 8;
+                            return v.value + ' jam\n' + (v.value/pembagi*100).toFixed(2) + '%'
                         }
                     },
                     data: []
