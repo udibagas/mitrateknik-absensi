@@ -1,7 +1,7 @@
 <template lang="html">
     <el-card>
         <el-form :inline="true" style="float:right;clear:both;">
-            <el-form-item>
+            <el-form-item v-if="user.admin === 1">
                 <el-button @click="add" type="primary"><i class="el-icon-plus"></i> INPUT ABSENSI</el-button>
             </el-form-item>
             <el-form-item>
@@ -32,7 +32,7 @@
             <el-table-column prop="dept_name" label="Departemen" sortable></el-table-column>
             <el-table-column prop="att_time" label="Jam" sortable width="100"></el-table-column>
             <el-table-column prop="gate.name" label="Gate" sortable width="120"></el-table-column>
-            <el-table-column width="70">
+            <el-table-column width="70" v-if="user.admin === 1">
                 <template slot-scope="scope">
                     <a href="#" @click.prevent="edit(scope.row)">Edit</a>
                 </template>
@@ -127,7 +127,8 @@ export default {
             loading: false,
             requestInterval: null,
             requestIntervalTime: 5000,
-            isRequesting: false
+            isRequesting: false,
+            user: USER
         }
     },
     watch: {

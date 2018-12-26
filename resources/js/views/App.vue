@@ -9,7 +9,7 @@
                 <font-awesome-icon icon="users" size="lg"></font-awesome-icon>
                 <span slot="title">USER</span>
             </el-menu-item>
-            <el-menu-item index="3" @click="$router.push('/log')" v-if="user.admin === 1">
+            <el-menu-item index="3" @click="$router.push('/log')">
                 <font-awesome-icon icon="clock" size="lg"></font-awesome-icon>
                 <span slot="title">LOG ABSENSI</span>
             </el-menu-item>

@@ -63,15 +63,13 @@ if (USER.admin === 1) {
         path: '/user',
         name: 'user',
         component: User
-    },
-    {
-        path: '/log',
-        name: 'log',
-        component: Log
     })
 }
 
-routes.push({ path: '*', component: NotFound })
+routes.push(
+    { path: '/log', name: 'log', component: Log },
+    { path: '*', component: Home }
+)
 
 const router = new VueRouter({
     mode: 'history',
