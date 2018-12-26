@@ -12,6 +12,7 @@ class AttendanceController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
+        $this->middleware('role:1');
     }
 
     public function index(Request $request)

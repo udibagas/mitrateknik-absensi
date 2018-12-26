@@ -16,10 +16,7 @@ class CheckRole
     public function handle($request, Closure $next, $role)
     {
         if (!$request->user()->admin == $role) {
-            return response([
-                'success' => false,
-                'message' => 'You are not allowed to acces this service'
-            ], 403);
+            return response(['error' => 'Unauthorized'], 401);
         }
 
         return $next($request);
