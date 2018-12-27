@@ -103,6 +103,12 @@
                     </a>
                 </template>
             </el-table-column>
+            <el-table-column 
+                prop="dept_name"
+                label="Departemen" 
+                :filters="departments.map(d => { let o = {}; o.text = o.value = d.name; return o;})" 
+                :filter-method="filterDepartment"
+                sortable></el-table-column>
             <el-table-column prop="first_in" label="Masuk" sortable width="90"></el-table-column>
             <el-table-column label="Jam Istirahat" sortable width="150">
                 <template slot-scope="scope">
@@ -140,6 +146,7 @@ export default {
     computed: {
         hari() { return this.$store.state.hari },
         persons() { return this.$store.state.persons },
+        departments() { return this.$store.state.departments },
         sortedData() {
             return  this.absensis.sort((a,b) => (a.jam_kerja_efektif > b.jam_kerja_efektif) ? 1 : ((a.jam_kerja_efektif < b.jam_kerja_efektif) ? -1 : 0))
         },
@@ -177,6 +184,10 @@ export default {
         }
     },
     methods: {
+         filterDepartment (value, row, column) {
+            const property = column['property'];
+            return row[property] === value;
+        },
         getDayName(date) {
             return this.hari[moment(date).day()]
         },

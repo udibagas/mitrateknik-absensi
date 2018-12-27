@@ -8,6 +8,7 @@ export default new Vuex.Store({
     state: {
         hari: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jum\'at', 'Sabtu'],
         areas: [],
+        departments: [],
         devices: [],
         gates: [],
         persons: [],
@@ -18,6 +19,14 @@ export default new Vuex.Store({
             let params = { api_token: state.api_token }
             axios.get(API_URL + '/area', { params: params }).then(function(r) {
                 state.areas = r.data
+            }).catch(function(e) {
+                console.log(e);
+            })
+        },
+        getDepartments (state) {
+            let params = { api_token: state.api_token }
+            axios.get(API_URL + '/department', { params: params }).then(function(r) {
+                state.departments = r.data
             }).catch(function(e) {
                 console.log(e);
             })

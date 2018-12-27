@@ -28,6 +28,9 @@ export default {
         return {
             user: USER
         }
+    },
+    mounted: function() {
+        this.$store.commit('getDepartments');
     }
 }
 </script>

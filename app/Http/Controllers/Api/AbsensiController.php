@@ -22,7 +22,8 @@ class AbsensiController extends Controller
         $pin = $request->person_pin ? "person_pin = '{$request->person_pin}'" : "1 = 1";
 
         $sql = "SELECT DISTINCT(att_date, person_pin) AS date_pin,
-            person_pin AS nik_var,
+            person_pin AS nik_var, 
+            dept_name,
             CONCAT(person_name, ' ', person_last_name) AS name_var,
             att_date AS absence_date,
             (SELECT att_time

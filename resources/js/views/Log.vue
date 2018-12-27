@@ -29,7 +29,12 @@
                     {{scope.row.person_name}} {{scope.row.person_last_name}}
                 </template>
             </el-table-column>
-            <el-table-column prop="dept_name" label="Departemen" sortable></el-table-column>
+            <el-table-column 
+                prop="dept_name" 
+                label="Departemen" 
+                :filters="departments.map(d => { let o = {}; o.text = o.value = d.name; return o;})" 
+                :filter-method="filterDepartment"
+                sortable></el-table-column>
             <el-table-column prop="att_time" label="Jam" sortable width="100"></el-table-column>
             <el-table-column prop="gate.name" label="Gate" sortable width="120"></el-table-column>
             <el-table-column width="70" v-if="user.admin === 1">
@@ -105,6 +110,7 @@ import exportFromJSON from 'export-from-json'
 export default {
     computed: {
         gates() { return this.$store.state.gates },
+        departments() { return this.$store.state.departments },
         persons() { return this.$store.state.persons },
         gate() { return this.gates.find(g => g.id === this.gate_id) },
         person() { return this.persons.find(p => p.pin === this.person_pin) },
@@ -151,6 +157,10 @@ export default {
         }
     },
     methods: {
+        filterDepartment (value, row, column) {
+            const property = column['property'];
+            return row[property] === value;
+        },
         add() {
             this.row_id = false
             this.error = {};

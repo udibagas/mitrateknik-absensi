@@ -18,6 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('area', 'Api\AreaController@index');
+Route::get('department', 'Api\DepartmentController@index');
 Route::get('absensi', 'Api\AbsensiController@index');
 Route::get('person', 'Api\PersonController@index');
 Route::get('device', 'Api\DeviceController@index');
