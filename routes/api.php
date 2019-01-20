@@ -25,3 +25,4 @@ Route::get('device', 'Api\DeviceController@index');
 Route::get('gate', 'Api\GateController@index');
 Route::resource('attendance', 'Api\AttendanceController')->only(['index', 'store', 'update']);
 Route::resource('user', 'Api\UserController')->only(['index', 'store', 'update', 'destroy']);
+Route::resource('timeSlot', 'Api\TimeSlotController')->only(['index', 'store', 'update']);

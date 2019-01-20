@@ -12,6 +12,7 @@ export default new Vuex.Store({
         devices: [],
         gates: [],
         persons: [],
+        timeslots: [],
         api_token: USER.api_token
     },
     mutations: {
@@ -51,6 +52,14 @@ export default new Vuex.Store({
             let params = { api_token: state.api_token }
             axios.get(API_URL + '/person', { params: params }).then(function(r) {
                 state.persons = r.data
+            }).catch(function(e) {
+                console.log(e);
+            })
+        },
+        getTimeslots (state) {
+            let params = { api_token: state.api_token }
+            axios.get(API_URL + '/timeSlot', { params: params }).then(function(r) {
+                state.timeslots = r.data
             }).catch(function(e) {
                 console.log(e);
             })

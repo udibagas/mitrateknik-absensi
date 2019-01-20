@@ -9,11 +9,15 @@
                 <font-awesome-icon icon="users" size="lg"></font-awesome-icon>
                 <span slot="title">USER</span>
             </el-menu-item>
-            <el-menu-item index="3" @click="$router.push('/log')">
+            <el-menu-item index="3" @click="$router.push('/timeSlot')" v-if="user.admin === 1">
+                <font-awesome-icon icon="calendar" size="lg"></font-awesome-icon>
+                <span slot="title">JAM KERJA</span>
+            </el-menu-item>
+            <el-menu-item index="4" @click="$router.push('/log')">
                 <font-awesome-icon icon="clock" size="lg"></font-awesome-icon>
                 <span slot="title">LOG ABSENSI</span>
             </el-menu-item>
-            <el-menu-item index="4" onclick="document.getElementById('logout-form').submit()">
+            <el-menu-item index="5" onclick="document.getElementById('logout-form').submit()">
                 <font-awesome-icon icon="sign-out-alt" size="lg"></font-awesome-icon>
                 <span slot="title">KELUAR</span>
             </el-menu-item>

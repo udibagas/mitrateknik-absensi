@@ -22,7 +22,8 @@ import {
     faUsers,
     faFilter,
     faClock,
-    faSignOutAlt
+    faSignOutAlt,
+    faCalendar
 } from '@fortawesome/free-solid-svg-icons'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -32,7 +33,8 @@ library.add(
     faUsers,
     faFilter,
     faClock,
-    faSignOutAlt
+    faSignOutAlt,
+    faCalendar
 )
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
@@ -41,7 +43,7 @@ import App from './views/App'
 import Home from './views/Home'
 import User from './views/User'
 import Log from './views/Log'
-import NotFound from './views/NotFound'
+import TimeSlot from './views/TimeSlot'
 import moment from 'moment'
 import store from './store'
 
@@ -63,6 +65,11 @@ if (USER.admin === 1) {
         path: '/user',
         name: 'user',
         component: User
+    },
+    {
+        path: '/timeSlot',
+        name: 'timeSlot',
+        component: TimeSlot
     })
 }
 

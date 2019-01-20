@@ -158,7 +158,7 @@ export default {
         },
         filteredData() {
             return this.absensis.filter(a => a.nik_var.includes(this.keyword) || a.name_var.toLowerCase().includes(this.keyword.toLowerCase()))
-        },
+        }
     },
     data: function() {
         return {
@@ -173,8 +173,7 @@ export default {
             selectedPerson: {},
             requestInterval: null,
             requestIntervalTime: 10000,
-            isRequesting: false,
-            timeslots: []
+            isRequesting: false
         }
     },
     watch: {
@@ -217,56 +216,73 @@ export default {
                 return
             }
 
-            this.loading = true
+            let _this = this
+            _this.loading = true
             let params = {
-                date: this.filterDate[0],
-                date_end: this.filterDate[1],
+                date: _this.filterDate[0],
+                date_end: _this.filterDate[1],
                 api_token: USER.api_token
             }
 
             axios.get(API_URL + '/absensi', { params: params }).then(r => {
-                this.loading = false
-                this.isRequesting = false
-                this.absensis = r.data
+                _this.loading = false
+                _this.isRequesting = false
+                _this.absensis = r.data
                 let totalPersentase = 0
                 let totalJamKerja = 0
 
-                this.absensis.forEach(a => {
-                    let day = moment(a.absence_date).day()
-
+                _this.absensis.forEach(a => {
                     if (!a.rest_start) {
-                        a.rest_start = this.timeslots[day].rest_start
+                        if (moment(a.absence_date).day() === 5) {
+                            a.rest_start = '11:30:00'
+                        } else {
+                            a.rest_start = '12:00:00'
+                        }
                     }
                     if (!a.rest_end) {
-                        a.rest_end = this.timeslots[day].rest_end
+                        a.rest_end = '13:00:00'
                     }
 
-                    a.istirahat = this.getDuration(a.rest_start, a.rest_end)
-                    let pembagi = this.timeslots[day].jam_kerja_max * 36
+                    a.istirahat = _this.getDuration(a.rest_start, a.rest_end)
+                    let pembagi = moment(a.absence_date).day() === 5 ? 7*36 : 8*36
 
                     a.jam_kerja_efektif = 0
                     a.persentase = 0
 
                     if (a.first_in && a.last_out) {
-                        let jam_masuk_efektif = moment(a.first_in, 'HH:mm:ss') < moment(this.timeslots[day].in, 'HH:mm:ss')
-                            ? moment(this.timeslots[day].in, 'HH:mm:ss')
-                            : moment(a.first_in, 'HH:mm:ss')
-
-                        let jam_keluar_efektif = moment(a.last_out, 'HH:mm:ss') < moment(this.timeslots[day].out, 'HH:mm:ss')
-                            ? moment(this.timeslots[day].out, 'HH:mm:ss')
+                        let jam_masuk_efektif = moment(a.first_in, 'HH:mm:ss').format('H') < 8
+                            ? moment('08:00:00', 'HH:mm:ss')
                             : moment(a.first_in, 'HH:mm:ss')
                         
-                        let durasi_kerja_sec = this.getDuration(jam_masuk_efektif, jam_keluar_efektif)
+                        let jam_keluar_efektif = moment(a.last_out, 'HH:mm:ss').format('H') >= 17
+                            ? moment('17:00:00', 'HH:mm:ss')
+                            : moment(a.last_out, 'HH:mm:ss')
+                        
+                        if (moment(a.absence_date).day() === 5) {
+                            jam_masuk_efektif = moment(a.first_in, 'HH:mm:ss').format('H') < 7
+                                ? moment('07:00:00', 'HH:mm:ss')
+                                : moment(a.first_in, 'HH:mm:ss')
+                            jam_keluar_efektif = moment(a.last_out, 'HH:mm:ss') >= moment('15:30', 'HH:mm')
+                                ? moment('15:30:00', 'HH:mm:ss')
+                                : moment(a.last_out, 'HH:mm:ss')
+                        }
 
-                        let jam_istirahat_start_efektif = moment(a.rest_start, 'HH:mm:ss') >= moment(this.timeslots[day].rest_start, 'HH:mm')
-                            ? moment(this.timeslots[day].rest_start, 'HH:mm:ss')
+                        let durasi_kerja_sec = _this.getDuration(jam_masuk_efektif, jam_keluar_efektif)
+
+                        let jam_istirahat_start_efektif = moment(a.rest_start, 'HH:mm:ss') >= moment('12:00', 'HH:mm')
+                            ? moment('12:00:00', 'HH:mm:ss')
                             : moment(a.rest_start, 'HH:mm:ss')
 
-                        let jam_istirahat_end_efektif = moment(a.rest_end, 'HH:mm:ss') >= moment(this.timeslots[day].rest_end, 'HH:mm')
-                            ? moment(this.timeslots[day].rest_end, 'HH:mm:ss')
+                        if (moment(a.absence_date).day() === 5) {
+                            jam_istirahat_start_efektif = moment(a.rest_start, 'HH:mm:ss') >= moment('11:30', 'HH:mm')
+                            ? moment('11:30:00', 'HH:mm:ss')
                             : moment(a.rest_start, 'HH:mm:ss')
-
-                        let durasi_istirahat_sec = this.getDuration(jam_istirahat_start_efektif, jam_istirahat_end_efektif)
+                        }
+                        
+                        let jam_istirahat_end_efektif = moment(a.rest_end, 'HH:mm:ss').format('H') < 13
+                            ? moment('13:00:00', 'HH:mm:ss')
+                            : moment(a.rest_end, 'HH:mm:ss')
+                        let durasi_istirahat_sec = _this.getDuration(jam_istirahat_start_efektif, jam_istirahat_end_efektif)
 
                         a.jam_kerja_efektif = durasi_kerja_sec - durasi_istirahat_sec
                         a.persentase = (a.jam_kerja_efektif / pembagi).toFixed(2)
@@ -276,33 +292,34 @@ export default {
                 })
 
                 if (totalPersentase > 0) {
-                    this.prodPercentAvg = (totalPersentase/this.absensis.length).toFixed(2)
+                    _this.prodPercentAvg = (totalPersentase/_this.absensis.length).toFixed(2)
                 }
 
                 if (totalJamKerja > 0) {
-                    this.prodHourAvg = (totalJamKerja/3600/this.absensis.length).toFixed(2)
+                    _this.prodHourAvg = (totalJamKerja/3600/_this.absensis.length).toFixed(2)
                 }
 
             }).catch(e => {
-                this.loading = false
-                this.isRequesting = false
+                _this.loading = false
+                _this.isRequesting = false
                 console.log(e);
             })
         },
         exportToExcel() {
             let data = []
             this.exportLabelBtn = 'Menyiapkan File...'
-            this.absensis.forEach(a => {
+            let _this = this
+            _this.absensis.forEach(a => {
                 data.push({
                     Tanggal: a.absence_date,
-                    Hari: this.getDayName(a.absence_date),
+                    Hari: _this.getDayName(a.absence_date),
                     NIK: a.nik_var,
                     Nama: a.name_var,
                     Masuk: a.first_in || '',
                     Jam_Istirahat: `${a.rest_start} - ${a.rest_end}`,
-                    Lama_Istirahat: this.secToTime(a.istirahat),
+                    Lama_Istirahat: _this.secToTime(a.istirahat),
                     Pulang: a.last_out || '',
-                    Jam_Kerja_Efektif: this.secToTime(a.jam_kerja_efektif),
+                    Jam_Kerja_Efektif: _this.secToTime(a.jam_kerja_efektif),
                     Persentase: a.persentase
                 })
             })
@@ -311,22 +328,13 @@ export default {
             let exportType = 'xls'
             exportFromJSON({ data, fileName, exportType })
             this.exportLabelBtn = 'EXPORT KE EXCEL'
-        },
-        getTimeSlots() {
-            let params = { api_token: USER.api_token }
-            axios.get(API_URL + '/timeSlot', { params: params }).then(r => {
-                r.data.forEach(t => {
-                    this.timeslots[t.day] = t
-                })
-                // console.log(this.timeslots)
-            })
         }
     },
-    created: function() {
-        this.getTimeSlots()
+    mounted: function() {
         this.requestData()
         this.requestInterval = setInterval(this.requestData, this.requestIntervalTime)
         this.$store.commit('getPersons');
+        this.$store.commit('getTimslots');
     },
     destroyed: function() {
         clearInterval(this.requestInterval)
