@@ -203,9 +203,9 @@ export default {
                             ? moment(this.timeslots[day].in, 'HH:mm:ss')
                             : moment(a.first_in, 'HH:mm:ss')
 
-                        let jam_keluar_efektif = moment(a.last_out, 'HH:mm:ss') < moment(this.timeslots[day].out, 'HH:mm:ss')
+                        let jam_keluar_efektif = moment(a.last_out, 'HH:mm:ss') >= moment(this.timeslots[day].out, 'HH:mm:ss')
                             ? moment(this.timeslots[day].out, 'HH:mm:ss')
-                            : moment(a.first_in, 'HH:mm:ss')
+                            : moment(a.last_out, 'HH:mm:ss')
 
                         let durasi_kerja_sec = this.getDuration(jam_masuk_efektif, jam_keluar_efektif)
 
@@ -213,9 +213,9 @@ export default {
                             ? moment(this.timeslots[day].rest_start, 'HH:mm:ss')
                             : moment(a.rest_start, 'HH:mm:ss')
 
-                        let jam_istirahat_end_efektif = moment(a.rest_end, 'HH:mm:ss') >= moment(this.timeslots[day].rest_end, 'HH:mm')
+                        let jam_istirahat_end_efektif = moment(a.rest_end, 'HH:mm:ss') < moment(this.timeslots[day].rest_end, 'HH:mm')
                             ? moment(this.timeslots[day].rest_end, 'HH:mm:ss')
-                            : moment(a.rest_start, 'HH:mm:ss')
+                            : moment(a.rest_end, 'HH:mm:ss')
                         
                         let durasi_istirahat_sec = this.getDuration(jam_istirahat_start_efektif, jam_istirahat_end_efektif)
 
