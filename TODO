@@ -11,3 +11,40 @@
 
 
 - User admin bisa mengedit log absensi untuk penyesuaian jika pegawai lupa absen atau sudah absen tetepai tidak masuk ke log
+
+# Run Laravel Scheduled Tasks on Windows
+
+The following are instructions for running scheduled tasks defined in a Laravel project on Windows. The Laravel documentation provides instructions for running scheduled tasks using cron jobs on Linux systems. However, cron jobs are not available on Windows. The built-in Windows Task Scheduler can be used to run scheduled tasks instead.
+
+## Create a Scheduled Task
+
+1. Open **Task Scheduler**
+2. Select _Create Task..._
+3. Give the task a name and description
+4. To run the task in the background, select _Run whether the user is logged on or not_ and check the _Hidden_ checkbox.
+
+### Triggers
+
+1. Create a new trigger.
+2. Set the trigger to run _Daily_ and recur every `1` days.
+3. Set _Repeat task every_ to `1 minutes`. `1 minutes` is not a selectable option. Simply select `5 minutes` from the dropdown and then manually edit.
+4. Set _for a duration of:_ to `Indefinitely`.
+5. Ensure that _Enabled_ is checked.
+
+
+### Actions
+
+1. Create a new action.
+2. Start php by entering the php binary location, such as `C:\php\php.exe`
+3. Set _Add arguments_ field to `C:\{project-dir}\artisan schedule:run` (replace `{project-dir}` with appropriate path).
+
+### Settings
+
+1. Check _Allow task to be run on demand_.
+2. Check _Run task as soon as possible after a scheduled start is missed_.
+
+## Wrap-up
+
+1. To ensure that the task is running, find the task in the _Task Scheduler Library_.
+2. Note the task _Status_. It may be _Ready_ or _Running_.
+3. Note the _Next Run Time_ and _Last Run Time_ properties.
