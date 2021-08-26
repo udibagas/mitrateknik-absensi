@@ -23,22 +23,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('area', [AreaController::class, 'index']);
+    Route::get('department', [DepartmentController::class, 'index']);
+    Route::get('absensi', [AbsensiController::class, 'index']);
+    Route::get('person', [PersonController::class, 'index']);
+    Route::get('device', [DeviceController::class, 'index']);
+    Route::get('gate', [GateController::class, 'index']);
+
+    Route::apiResources([
+        'attendance' => AttendanceController::class,
+        'user' => UserController::class,
+        'timeSlot' => TimeSlotController::class
+    ]);
 });
 
-Route::get('area', [AreaController::class, 'index']);
-Route::get('department', [DepartmentController::class, 'index']);
-Route::get('absensi', [AbsensiController::class, 'index']);
-Route::get('person', [PersonController::class, 'index']);
-Route::get('device', [DeviceController::class, 'index']);
-Route::get('gate', [GateController::class, 'index']);
-
-Route::apiResources([
-    'attendance' => AttendanceController::class,
-    'user' => UserController::class,
-    'timeSlot' => TimeSlotController::class
-]);
 
 // Route::resource('attendance', 'Api\AttendanceController')->only(['index', 'store', 'update']);
 // Route::resource('user', 'Api\UserController')->only(['index', 'store', 'update', 'destroy']);
