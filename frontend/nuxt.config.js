@@ -24,7 +24,7 @@ export default {
   css: ['element-ui/lib/theme-chalk/index.css', '@/assets/app.css'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['@/plugins/element-ui', '@/plugins/decimal'],
+  plugins: ['@/plugins/element-ui', '@/plugins/decimal', '@/plugins/axios'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -45,11 +45,12 @@ export default {
 
   auth: {
     strategies: {
-      local: {
+      cookie: {
         endpoints: {
           login: { url: '/api/login' },
           logout: { url: '/api/logout' },
           user: { url: '/api/me' },
+          csrf: { url: '/sanctum/csrf-cookie' },
         },
       },
     },
@@ -57,7 +58,7 @@ export default {
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: process.env.API_URL || '',
+    baseURL: process.env.API_URL || 'http://localhost:8000',
     credentials: true,
   },
 

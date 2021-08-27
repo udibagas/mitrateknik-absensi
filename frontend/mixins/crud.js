@@ -3,23 +3,29 @@ export default {
     return {
       showForm: false,
       formErrors: {},
-      error: {},
       formModel: {},
       keyword: '',
       page: 1,
       pageSize: 10,
       tableData: {},
-      sort: 'name',
-      order: 'ascending',
+      sort_prop: null,
+      sort_order: null,
       filters: {},
       loading: false,
     }
   },
   methods: {
-    sortChange(c) {
-      if (c.prop != this.sort || c.order != this.order) {
-        this.sort = c.prop
-        this.order = c.order
+    sortChange({ prop, order }) {
+      if (prop != this.sort_prop || order != this.sort_order) {
+        if (order == 'ascending') {
+          this.sort_order = 'asc'
+        } else if (order == 'descending') {
+          this.sort_order = 'desc'
+        } else {
+          this.sort_order = 'asc'
+        }
+
+        this.sort_prop = prop
         this.requestData()
       }
     },
@@ -41,7 +47,6 @@ export default {
     },
 
     openForm(data) {
-      this.error = {}
       this.formErrors = {}
       this.formModel = { ...data }
       this.showForm = true
@@ -67,13 +72,9 @@ export default {
         })
         .catch((e) => {
           if (e.response.status == 422) {
-            this.error = {}
             this.formErrors = e.response.data.errors
-          }
-
-          if (e.response.status == 500) {
+          } else {
             this.formErrors = {}
-            this.error = e.response.data
           }
         })
         .finally(() => {
@@ -94,24 +95,15 @@ export default {
         type: 'warning',
       })
         .then(() => {
-          this.$axios
-            .$delete(`${this.url}/${id}`)
-            .then((r) => {
-              this.requestData()
-              this.afterDelete()
-              this.$message({
-                message: r.message,
-                type: 'success',
-                showClose: true,
-              })
+          this.$axios.$delete(`${this.url}/${id}`).then((r) => {
+            this.requestData()
+            this.afterDelete()
+            this.$message({
+              message: r.message,
+              type: 'success',
+              showClose: true,
             })
-            .catch((e) => {
-              this.$message({
-                message: e.response.data.message,
-                type: 'error',
-                showClose: true,
-              })
-            })
+          })
         })
         .catch(() => console.log(e))
     },
@@ -140,8 +132,8 @@ export default {
         page: this.page,
         keyword: this.keyword,
         pageSize: this.pageSize,
-        sort: this.sort,
-        order: this.order == 'descending' ? 'desc' : 'asc',
+        sort_prop: this.sort_prop,
+        sort_order: this.sort_order,
         paginated: true,
         ...this.filters,
       }
@@ -162,13 +154,6 @@ export default {
               total,
             }
           }
-        })
-        .catch((e) => {
-          this.$message({
-            message: e.response.data.message,
-            type: 'error',
-            showClose: true,
-          })
         })
         .finally(() => (this.loading = false))
     },

@@ -9,11 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:api');
-    }
-
     public function index(Request $request)
     {
         return Attendance::where('att_date', $request->date)

@@ -1,15 +1,15 @@
 <?php
 
-use App\Http\Controllers\Api\AbsensiController;
-use App\Http\Controllers\Api\AreaController;
-use App\Http\Controllers\Api\AttendanceController;
-use App\Http\Controllers\Api\DepartmentController;
-use App\Http\Controllers\Api\DeviceController;
-use App\Http\Controllers\Api\GateController;
-use App\Http\Controllers\Api\PersonController;
-use App\Http\Controllers\Api\TimeSlotController;
-use App\Http\Controllers\Api\UserController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\AreaController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\GateController;
+use App\Http\Controllers\PersonController;
+use App\Http\Controllers\TimeSlotController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,7 +23,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::post('login', [AuthController::class, 'login']);
+
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('me', [AuthController::class, 'me']);
+    Route::post('logout', [AuthController::class, 'logout']);
 
     Route::get('area', [AreaController::class, 'index']);
     Route::get('department', [DepartmentController::class, 'index']);
@@ -36,7 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'attendance' => AttendanceController::class,
         'user' => UserController::class,
         'timeSlot' => TimeSlotController::class
-    ]);
+    ], ['except' => 'show']);
 });
 
 

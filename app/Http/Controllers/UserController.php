@@ -11,19 +11,15 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api');
         $this->middleware('role:1');
     }
 
     public function index(Request $request)
     {
-        $sort = $request->sort ? $request->sort : 'name';
-        $order = $request->order == 'ascending' ? 'asc' : 'desc';
-
         return User::when($request->keyword, function ($q) use ($request) {
-            return $q->where('name', 'LIKE', '%' . $request->keyword . '%')
+            $q->where('name', 'LIKE', '%' . $request->keyword . '%')
                 ->orWhere('email', 'LIKE', '%' . $request->keyword . '%');
-        })->orderBy($sort, $order)->paginate($request->pageSize);
+        })->orderBy($request->sort_prop ?: 'name', $request->sort_order ?: 'asc')->paginate($request->pageSize);
     }
 
     public function store(UserRequest $request)
@@ -31,7 +27,8 @@ class UserController extends Controller
         $input = $request->all();
         $input['password'] = bcrypt($request->password);
         $input['api_token'] = str_random(60);
-        return User::create($input);
+        User::create($input);
+        return ['message' => 'Data telah disimpan'];
     }
 
     public function update(User $user, UserRequest $request)
@@ -44,11 +41,12 @@ class UserController extends Controller
         }
 
         $user->update($input);
-        return $user;
+        return ['message' => 'Data telah disimpan'];
     }
 
     public function destroy(User $user)
     {
-        return ['status' => $user->delete()];
+        $user->delete();
+        return ['message' => 'Data telah dihapus'];
     }
 }
