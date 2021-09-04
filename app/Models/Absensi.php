@@ -21,6 +21,17 @@ class Absensi extends Model
         'rest_end'
     ];
 
+    protected $appends = [
+        'day',
+        'jam_masuk_efektif',
+        'jam_keluar_efektif',
+        'jam_mulai_istirahat',
+        'jam_selesai_istirahat',
+        'durasi_istirahat',
+        'jam_kerja_efektif',
+        'prosentase'
+    ];
+
     public function getDayAttribute()
     {
         return date('w', strtotime($this->date));
