@@ -17,7 +17,7 @@ class AddApiTokenOnUser extends Migration
             $table->string('api_token', 60)->nullable();
         });
 
-        foreach (App\User::all() as $u) {
+        foreach (App\Models\User::all() as $u) {
             $u->api_token = str_random(60);
             $u->save();
         }
