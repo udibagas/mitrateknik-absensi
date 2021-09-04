@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-use App\TimeSlot;
+use App\Models\TimeSlot;
 
 class CreateTimeSlotsTable extends Migration
 {
@@ -16,7 +16,7 @@ class CreateTimeSlotsTable extends Migration
     {
         Schema::create('time_slots', function (Blueprint $table) {
             $table->increments('id');
-            $table->boolean('day');
+            $table->tinyInteger('day')->comment('0 = sunday, 6 = saturday');
             $table->time('in');
             $table->time('out');
             $table->time('rest_start');
