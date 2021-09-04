@@ -1,6 +1,5 @@
 export const state = () => ({
   navigationList: [],
-  hari: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu'],
   areas: [],
   departments: [],
   devices: [],
