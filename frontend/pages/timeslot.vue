@@ -1,6 +1,6 @@
 <template>
 	<el-card>
-		<div style="font-size: 1.2em; line-height: 41px">KELOLA USER</div>
+		<div style="font-size: 1.2em" class="mb-3">KELOLA TIMESLOT</div>
 		<table class="table table-striped table-hover">
 			<thead>
 				<tr>
@@ -11,26 +11,32 @@
 					<th>Jam Istirahat Keluar</th>
 					<th>Jam Istirahat Masuk</th>
 					<th>Jam Kerja Maksimal</th>
-					<th class="text-right">
-						<el-button type="primary" size="small" @click="requestData"
-							>REFRESH</el-button
-						>
+					<th class="text-center">
+						<el-button
+							type="primary"
+							size="small"
+							icon="el-icon-refresh"
+							@click="requestData"
+						></el-button>
 					</th>
 				</tr>
 			</thead>
 			<tbody v-loading="loading">
-				<tr v-for="(t, i) in timeslots" :key="i">
+				<tr v-for="(t, i) in tableData" :key="i">
 					<td>{{ ++i }}</td>
-					<td>{{ hari[t.day].toUpperCase() }}</td>
+					<td>{{ t.hari }}</td>
 					<td><el-input v-model="t.in"></el-input></td>
 					<td><el-input v-model="t.out"></el-input></td>
 					<td><el-input v-model="t.rest_start"></el-input></td>
 					<td><el-input v-model="t.rest_end"></el-input></td>
 					<td><el-input v-model="t.jam_kerja_max"></el-input></td>
-					<td class="text-right">
-						<el-button type="primary" size="small" @click="save(t)"
-							>SIMPAN</el-button
-						>
+					<td class="text-center">
+						<el-button
+							type="primary"
+							size="small"
+							icon="el-icon-check"
+							@click="save(t)"
+						></el-button>
 					</td>
 				</tr>
 			</tbody>
@@ -40,7 +46,7 @@
 
 <script>
 import crud from '@/mixins/crud'
-import { mapState } from 'vuex'
+
 export default {
 	mixins: [crud],
 	data() {
@@ -49,18 +55,15 @@ export default {
 		}
 	},
 
-	computed: {
-		...mapState(['hari']),
-	},
-
 	methods: {
 		save(data) {
-			this.$axios.$put(`/api/timeSlot/${t.id}`, data).then((r) => {
-				this.tableData = r.data
+			this.$axios.$put(`/api/timeSlot/${data.id}`, data).then((r) => {
 				this.$message({
 					message: r.message,
 					type: 'success',
 				})
+
+				this.tableData = r.data
 			})
 		},
 	},

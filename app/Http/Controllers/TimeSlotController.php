@@ -40,6 +40,10 @@ class TimeSlotController extends Controller
     public function update(TimeSlotRequest $request, TimeSlot $timeSlot)
     {
         $timeSlot->update($request->all());
-        return TimeSlot::orderBy('day', 'ASC')->get();
+
+        return [
+            'message' => 'Data telah disimpan',
+            'data' => TimeSlot::orderBy('day', 'ASC')->get()
+        ];
     }
 }
