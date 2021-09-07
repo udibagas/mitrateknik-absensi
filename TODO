@@ -12,6 +12,12 @@
 
 - User admin bisa mengedit log absensi untuk penyesuaian jika pegawai lupa absen atau sudah absen tetepai tidak masuk ke log
 
+Pertanyaan:
+- Device attendance tidak perlu di setting?
+- Apakah Access otomatis jadi attendance asal di set di attendance point?
+- Calculate attendance apakah realtime, atau harus manual?
+- bisa test push server?
+
 # Run Laravel Scheduled Tasks on Windows
 
 The following are instructions for running scheduled tasks defined in a Laravel project on Windows. The Laravel documentation provides instructions for running scheduled tasks using cron jobs on Linux systems. However, cron jobs are not available on Windows. The built-in Windows Task Scheduler can be used to run scheduled tasks instead.
