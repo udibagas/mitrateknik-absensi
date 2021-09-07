@@ -1,4 +1,7 @@
 <?php
+
+namespace App\Libraries;
+
 error_reporting(0);
 
 define('CMD_CONNECT', 1000);
@@ -225,7 +228,7 @@ class ZKLibrary
             $chksum -= USHRT_MAX;
         }
         if ($chksum > 0) {
-            $chksum = -($chksum);
+            $chksum = - ($chksum);
         } else {
             $chksum = abs($chksum);
         }

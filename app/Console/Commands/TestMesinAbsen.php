@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use ZKLibrary;
+use App\Libraries\ZKLibrary;
 
 class TestMesinAbsen extends Command
 {
