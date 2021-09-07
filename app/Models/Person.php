@@ -24,6 +24,6 @@ class Person extends Model
 
     public function getPhotoPathAttribute($value)
     {
-        return url(env('SERVER_ADDR', '10.4.21.111'), $this->photo_path);
+        return url(env('SERVER_ADDR', '10.4.21.111'), $value);
     }
 }

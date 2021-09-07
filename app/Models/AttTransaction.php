@@ -14,4 +14,14 @@ class AttTransaction extends Model
     protected $table = 'att_transaction';
 
     public $timestamps = false;
+
+    public function device()
+    {
+        return $this->belongsTo(Device::class);
+    }
+
+    public function person()
+    {
+        return $this->belongsTo(Person::class, 'person_pin', 'pin');
+    }
 }
