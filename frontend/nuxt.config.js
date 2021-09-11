@@ -7,7 +7,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'KAI BALAI YASA TEGAL',
+    title: 'KAI - UPT BALAI YASA TEGAL',
     htmlAttrs: {
       lang: 'en',
     },
@@ -28,7 +28,7 @@ export default {
     '@/plugins/element-ui',
     '@/plugins/decimal',
     '@/plugins/axios',
-    '@/plugins/echo',
+    // '@/plugins/echo',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -64,9 +64,9 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // prod
-    baseURL: process.env.API_URL || '',
+    // baseURL: process.env.API_URL || '',
     // dev
-    // baseURL: process.env.API_URL || 'http://localhost:8000',
+    baseURL: process.env.API_URL || 'http://localhost:8000',
     credentials: true,
   },
 
