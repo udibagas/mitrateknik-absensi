@@ -4,7 +4,6 @@ export default {
       showForm: false,
       formErrors: {},
       formModel: {},
-      keyword: '',
       page: 1,
       pageSize: 10,
       tableData: {},
@@ -14,6 +13,7 @@ export default {
       loading: false,
     }
   },
+
   methods: {
     sortChange({ prop, order }) {
       if (prop != this.sort_prop || order != this.sort_order) {
@@ -110,13 +110,11 @@ export default {
 
     searchData(v) {
       this.page = 1
-      this.keyword = v
       this.requestData()
     },
 
     refreshData() {
       this.page = 1
-      this.keyword = ''
       this.filters = {}
       this.requestData()
     },
@@ -130,7 +128,6 @@ export default {
     requestData() {
       let params = {
         page: this.page,
-        keyword: this.keyword,
         pageSize: this.pageSize,
         sort_prop: this.sort_prop,
         sort_order: this.sort_order,
@@ -158,6 +155,7 @@ export default {
         .finally(() => (this.loading = false))
     },
   },
+
   mounted() {
     this.requestData()
   },
