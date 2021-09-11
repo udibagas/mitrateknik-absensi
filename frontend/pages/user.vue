@@ -15,7 +15,7 @@
 				<el-form-item style="margin-bottom: 0">
 					<el-input
 						size="small"
-						v-model="keyword"
+						v-model="filters.keyword"
 						placeholder="Cari"
 						prefix-icon="el-icon-search"
 						:clearable="true"
@@ -30,7 +30,6 @@
 
 		<el-table
 			stripe
-			height="calc(100vh - 255px)"
 			v-loading="loading"
 			:data="tableData.data"
 			@sort-change="sortChange"
