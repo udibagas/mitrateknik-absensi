@@ -10,12 +10,12 @@ class Device extends Model
 
     protected $table = 'acc_device';
 
-    protected $visible = ['id', 'sn', 'dev_alias', 'area'];
+    protected $visible = ['id', 'sn', 'dev_alias', 'device_name', 'area'];
 
     protected $with = ['area'];
 
     public function area()
     {
-        return $this->belongsTo(Area::class, 'area_id');
+        return $this->belongsTo(Area::class, 'auth_area_id');
     }
 }
