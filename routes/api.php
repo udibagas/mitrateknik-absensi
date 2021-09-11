@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\AccessController;
 use App\Http\Controllers\AreaController;
-use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\GateController;
@@ -37,13 +37,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('gate', [GateController::class, 'index']);
 
     Route::apiResources([
-        'attendance' => AttendanceController::class,
+        'access' => AccessController::class,
         'user' => UserController::class,
         'timeSlot' => TimeSlotController::class
     ], ['except' => 'show']);
 });
-
-
-// Route::resource('attendance', 'Api\AttendanceController')->only(['index', 'store', 'update']);
-// Route::resource('user', 'Api\UserController')->only(['index', 'store', 'update', 'destroy']);
-// Route::resource('timeSlot', 'Api\TimeSlotController')->only(['index', 'store', 'update']);
