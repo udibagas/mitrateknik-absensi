@@ -1,41 +1,38 @@
 <template>
-	<el-main style="text-align: center; background: #fff">
-		<img
-			src="/images/logo.jpeg"
-			style="width: 70px; margin-top: 80px; border-radius: 5px"
-		/>
-		<h2>KAI BALAI YASA TEGAL</h2>
-		<el-form
-			@submit.native.prevent="login"
-			style="width: 300px; margin: 20px auto 0; text-align: center"
-		>
-			<el-divider>
-				<h3>LOGIN</h3>
-			</el-divider>
+	<el-main>
+		<div class="form-container">
+			<img src="/images/logo.png" style="width: 200px" />
+			<h2 class="text-white mt-0">UPT BALAI YASA TEGAL</h2>
+			<el-form
+				@submit.native.prevent="login"
+				style="width: 320px; margin: 20px auto 0; text-align: center"
+			>
+				<el-form-item>
+					<el-input
+						prefix-icon="el-icon-user"
+						v-model="email"
+						placeholder="Email/Username"
+					></el-input>
+				</el-form-item>
+				<el-form-item>
+					<el-input
+						prefix-icon="el-icon-lock"
+						type="password"
+						v-model="password"
+						placeholder="Password"
+					></el-input>
+				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" native-type="submit" style="width: 100%"
+						>LOGIN</el-button
+					>
+				</el-form-item>
 
-			<el-form-item>
-				<el-input v-model="email" placeholder="Email/Username"></el-input>
-			</el-form-item>
-			<el-form-item>
-				<el-input
-					type="password"
-					v-model="password"
-					placeholder="Password"
-				></el-input>
-			</el-form-item>
-			<el-form-item>
-				<el-button
-					type="primary"
-					native-type="submit"
-					@click.prevent="login"
-					style="width: 100%"
-					>LOGIN</el-button
-				>
-			</el-form-item>
-
-			<!-- <a href="http://www.mitrateknik.co.id">www.MitraTeknik.co.id</a><br> -->
-			<el-divider>&copy; {{ year }}</el-divider>
-		</el-form>
+				<div class="text-white">
+					&copy; {{ $moment().format('YYYY') }} - UPT Balai Yasa Tegal
+				</div>
+			</el-form>
+		</div>
 	</el-main>
 </template>
 
@@ -46,9 +43,9 @@ export default {
 		return {
 			email: '',
 			password: '',
-			year: this.$moment().format('YYYY'),
 		}
 	},
+
 	methods: {
 		login() {
 			this.$auth
@@ -63,3 +60,22 @@ export default {
 	},
 }
 </script>
+
+<style scoped>
+.el-main {
+	height: 100vh;
+	background-image: url('/images/bg.jpg');
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+}
+
+.form-container {
+	margin: 120px auto 0;
+	background-color: rgba(0, 0, 0, 0.7);
+	padding: 20px;
+	width: 350px;
+	border-radius: 4px;
+	text-align: center;
+}
+</style>
