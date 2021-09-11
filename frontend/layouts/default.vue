@@ -1,71 +1,54 @@
 <template>
 	<el-container>
-		<el-aside width="auto">
-			<div v-show="!collapse" class="brand-box">
-				<img
-					src="/images/logo.jpeg"
-					style="
-						height: 60px;
-						width: 60px;
-						margin: 25px 0 10px 0;
-						border-radius: 5px;
-					"
-					alt
-				/>
-
-				<div>
-					<strong>{{ $auth.user.name }}</strong>
-					<br />
-					<small>{{ $auth.user.role ? 'Admin' : 'Operator' }}</small>
-				</div>
+		<el-header style="display: flex; justify-content: space-between">
+			<div class="flex">
+				<img src="/images/logo.jpeg" style="height: 55px" alt />
+				<div class="brand">UPT BALAI YASA TEGAL</div>
 			</div>
-			<el-menu
-				router
-				:collapse="collapse"
-				:default-active="$route.path"
-				background-color="#060446"
-				text-color="#fff"
-				class="sidebar"
-				active-text-color="#cc0000"
-			>
-				<el-menu-item v-for="(m, i) in navigationList" :index="m.path" :key="i">
-					<i :class="m.icon"></i>
-					<span slot="title">{{ m.label }}</span>
-				</el-menu-item>
-			</el-menu>
-		</el-aside>
+			<div>
+				<el-dropdown
+					@command="handleCommand"
+					style="height: 60px; line-height: 60px"
+				>
+					<span class="el-dropdown-link" style="cursor: pointer">
+						Selamat Datang, {{ $auth.user.name }}!
+					</span>
+					<el-dropdown-menu slot="dropdown">
+						<el-dropdown-item icon="el-icon-user" command="profile">
+							Profil Saya
+						</el-dropdown-item>
+						<el-dropdown-item icon="el-icon-arrow-right" command="logout">
+							Keluar
+						</el-dropdown-item>
+					</el-dropdown-menu>
+				</el-dropdown>
+				<span style="color: #666; font-size: 0.9em; margin-left: 20px">
+					<i class="el-icon-date"></i>
+					{{ timer }}
+				</span>
+			</div>
+		</el-header>
 		<el-container>
-			<el-header>
-				<el-row>
-					<el-col :span="12">
-						<el-button
-							type="text"
-							class="btn-big text-white"
-							@click.prevent="collapse = !collapse"
-							:icon="collapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
-						></el-button>
-						<span class="brand">KAI BALAI YASA TEGAL</span>
-					</el-col>
-					<el-col :span="12" class="text-right">
-						<el-dropdown @command="handleCommand">
-							<span class="el-dropdown-link text-white" style="cursor: pointer"
-								>Selamat Datang, {{ $auth.user.name }}!</span
-							>
-							<el-dropdown-menu slot="dropdown">
-								<el-dropdown-item icon="el-icon-user" command="profile">
-									Profil Saya
-								</el-dropdown-item>
-								<el-dropdown-item icon="el-icon-arrow-right" command="logout">
-									Keluar
-								</el-dropdown-item>
-							</el-dropdown-menu>
-						</el-dropdown>
-					</el-col>
-				</el-row>
-			</el-header>
-			<el-main
-				style="padding: 20px; height: calc(100vh - 60px); overflow: auto"
-			>
+			<el-aside width="auto">
+				<el-menu
+					router
+					:collapse="collapse"
+					:default-active="$route.path"
+					active-text-color="#FF5E0A"
+				>
+					<el-menu-item v-for="(m, i) in menus" :index="m.path" :key="i">
+						<i :class="m.icon"></i>
+						<span slot="title">{{ m.label }}</span>
+					</el-menu-item>
+				</el-menu>
+
+				<!-- <el-button
+					type="text"
+					@click.prevent="collapse = !collapse"
+					:icon="collapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
+				></el-button> -->
+			</el-aside>
+			<el-main>
 				<router-view @back="goBack"></router-view>
 				<Profile :show="showProfile" @close="showProfile = false" />
 			</el-main>
@@ -74,19 +57,36 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 export default {
 	middleware: ['auth'],
 
-	computed: {
-		...mapState(['navigationList']),
-	},
-
 	data() {
 		return {
-			collapse: false,
+			collapse: true,
 			showProfile: false,
+			timer: this.$moment().format('DD/MMM/YYYY HH:mm:ss'),
+			menus: [
+				{
+					label: 'BERANDA',
+					icon: 'el-icon-data-analysis',
+					path: '/',
+				},
+				{
+					label: 'LOG ABSENSI',
+					icon: 'el-icon-date',
+					path: '/log',
+				},
+				{
+					label: 'JAM KERJA',
+					icon: 'el-icon-alarm-clock',
+					path: '/time-slot',
+				},
+				{
+					label: 'USER',
+					icon: 'el-icon-user',
+					path: '/user',
+				},
+			],
 		}
 	},
 
@@ -108,8 +108,43 @@ export default {
 		},
 	},
 
-	async created() {
-		// TODO
+	created() {
+		this.$store.dispatch('getGates')
+		this.$store.dispatch('getPersons')
+		setInterval(() => {
+			this.timer = this.$moment().format('DD/MMM/YYYY HH:mm:ss')
+		}, 1000)
 	},
 }
 </script>
+
+<style scoped>
+/* .el-aside {
+	border-right: 1px solid #ddd;
+} */
+
+/* .el-header {
+	border-bottom: 1px solid #ddd;
+} */
+
+.el-menu {
+	border-right: none;
+}
+
+.el-menu-item [class^='el-icon-'] {
+	font-size: 30px;
+}
+
+.brand {
+	font-size: 24px;
+	line-height: 60px;
+	margin-left: 10px;
+}
+
+.el-main {
+	height: calc(100vh - 60px);
+	overflow: auto;
+	background: #efefef;
+	padding: 10px;
+}
+</style>
