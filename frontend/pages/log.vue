@@ -1,7 +1,7 @@
 <template>
 	<el-card>
 		<div style="display: flex; justify-content: space-between">
-			<div style="font-size: 1.2em; line-height: 41px">LOG ABSENSI</div>
+			<div style="font-size: 1.2em; line-height: 41px">LOG AKSES</div>
 			<el-form inline class="text-right" @submit.native.prevent>
 				<el-form-item v-if="$auth.user.admin">
 					<el-button
@@ -19,7 +19,7 @@
 						icon="el-icon-download"
 						type="primary"
 						:loading="loading"
-						@click="exportToExcel"
+						@click="exportData('log-akses.xls')"
 						size="small"
 						title="EXPORT KE EXCEL"
 					>
@@ -31,6 +31,7 @@
 						v-model="filters.date"
 						type="date"
 						value-format="yyyy-MM-dd"
+						format="dd-MMM-yyyy"
 						size="small"
 						style="width: 150px"
 						@change="searchData"
@@ -45,37 +46,45 @@
 						v-model="filters.keyword"
 						size="small"
 						@change="searchData"
+						clearable
 					>
 					</el-input>
 				</el-form-item>
 			</el-form>
 		</div>
 
-		<el-table stripe :data="tableData">
-			<el-table-column type="index" width="50"></el-table-column>
+		<el-table
+			stripe
+			:data="tableData.data"
+			v-loading="loading"
+			@sort-change="sortChange"
+			@filter-change="filterChange"
+			height="calc(100vh - 235px)"
+		>
+			<el-table-column type="index" width="50" label="#"></el-table-column>
+
+			<el-table-column prop="event_time" label="Tanggal" sortable width="120">
+				<template slot-scope="scope">
+					{{ $moment(scope.row.event_time).format('DD-MMM-YYYY') }}
+				</template>
+			</el-table-column>
 
 			<el-table-column
-				prop="att_date"
-				label="Tanggal"
-				sortable
-				width="100"
-			></el-table-column>
-
-			<el-table-column
-				prop="person_pin"
+				prop="pin"
 				label="NIK"
-				sortable
+				sortable="custom"
 				width="100"
 			></el-table-column>
 
 			<el-table-column
-				prop="person_name"
+				prop="name"
 				label="Nama"
-				sortable
+				sortable="custom"
 				show-overflow-tooltip
+				min-width="150"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.person_name }} {{ scope.row.person_last_name }}
+					{{ scope.row.name }} {{ scope.row.last_name }}
 				</template>
 			</el-table-column>
 
@@ -83,22 +92,24 @@
 				prop="dept_name"
 				label="Departemen"
 				show-overflow-tooltip
+				sortable="custom"
+				min-width="150"
+				column-key="dept_name"
 				:filters="departments.map((d) => ({ text: d.name, value: d.name }))"
-				sortable
 			></el-table-column>
 
-			<el-table-column
-				prop="att_time"
-				label="Jam"
-				sortable
-				width="100"
-			></el-table-column>
+			<el-table-column prop="event_time" label="Jam" sortable width="100">
+				<template slot-scope="scope">
+					{{ $moment(scope.row.event_time).format('HH:mm:ss') }}
+				</template>
+			</el-table-column>
 
 			<el-table-column
-				prop="gate.name"
+				prop="event_point_name"
 				label="Gate"
 				sortable
-				width="120"
+				min-width="150"
+				show-overflow-tooltip
 			></el-table-column>
 
 			<el-table-column
@@ -107,12 +118,18 @@
 				align="center"
 				header-align="center"
 			>
+				<template slot="header">
+					<el-button type="text" @click="refreshData" icon="el-icon-refresh">
+					</el-button>
+				</template>
 				<template slot-scope="scope">
 					<el-button
 						icon="el-icon-edit"
 						type="text"
+						size="small"
 						@click.prevent="openForm(scope.row)"
-					></el-button>
+						>Edit</el-button
+					>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -126,7 +143,7 @@
 			@size-change="sizeChange"
 			layout="total, sizes, prev, pager, next"
 			:page-size="pageSize"
-			:page-sizes="[10, 25, 50, 100]"
+			:page-sizes="[20, 50, 100, 200, 500]"
 			:total="tableData.total"
 		></el-pagination>
 
@@ -144,12 +161,12 @@
 			>
 				<el-form-item
 					label="Nama Pegawai"
-					:class="{ 'is-error': formErrors.person_pin }"
+					:class="{ 'is-error': formErrors.pin }"
 				>
 					<el-select
 						:disabled="!!formModel.id"
 						placeholder="Nama Pegawai"
-						v-model="formModel.person_pin"
+						v-model="formModel.pin"
 						style="width: 100%"
 						filterable
 						default-first-option
@@ -162,15 +179,18 @@
 						></el-option>
 					</el-select>
 
-					<div class="el-form-item__error" v-if="formErrors.person_pin">
-						{{ formErrors.person_pin.join(', ') }}
+					<div class="el-form-item__error" v-if="formErrors.pin">
+						{{ formErrors.pin.join(', ') }}
 					</div>
 				</el-form-item>
 
-				<el-form-item label="Gate" :class="{ 'is-error': formErrors.gate_id }">
+				<el-form-item
+					label="Gate"
+					:class="{ 'is-error': formErrors.event_point_id }"
+				>
 					<el-select
 						placeholder="Gate"
-						v-model="formModel.gate_id"
+						v-model="formModel.event_point_id"
 						style="width: 100%"
 						filterable
 						default-first-option
@@ -183,42 +203,42 @@
 						></el-option>
 					</el-select>
 
-					<div class="el-form-item__error" v-if="formErrors.gate_id">
-						{{ formErrors.gate_id.join(', ') }}
+					<div class="el-form-item__error" v-if="formErrors.event_point_id">
+						{{ formErrors.event_point_id.join(', ') }}
 					</div>
 				</el-form-item>
 
 				<el-form-item
 					label="Tanggal"
-					:class="{ 'is-error': formErrors.att_date }"
+					:class="{ 'is-error': formErrors.event_time_date }"
 				>
 					<el-date-picker
-						v-model="formModel.att_date"
+						v-model="formModel.event_time_date"
 						type="date"
 						value-format="yyyy-MM-dd"
-						format="dd-MMM-yyyy"
+						format="dd-MM-yyyy"
 						placeholder="Tanggal"
 						style="width: 100%"
 						:clearable="false"
 					>
 					</el-date-picker>
 
-					<div class="el-form-item__error" v-if="formErrors.att_date">
-						{{ formErrors.att_date.join(', ') }}
+					<div class="el-form-item__error" v-if="formErrors.event_time_date">
+						{{ formErrors.event_time_date.join(', ') }}
 					</div>
 				</el-form-item>
 
 				<el-form-item
 					label="Jam (mm:dd)"
-					:class="{ 'is-error': formErrors.att_time }"
+					:class="{ 'is-error': formErrors.event_time_time }"
 				>
 					<el-input
-						v-model="formModel.att_time"
+						v-model="formModel.event_time_time"
 						placeholder="Jam (mm:dd)"
 					></el-input>
 
-					<div class="el-form-item__error" v-if="formErrors.att_time">
-						{{ formErrors.att_time.join(', ') }}
+					<div class="el-form-item__error" v-if="formErrors.event_time_time">
+						{{ formErrors.event_time_time.join(', ') }}
 					</div>
 				</el-form-item>
 			</el-form>
@@ -233,7 +253,6 @@
 </template>
 
 <script>
-import exportFromJSON from 'export-from-json'
 import { mapState } from 'vuex'
 import crud from '~/mixins/crud'
 
@@ -246,7 +265,8 @@ export default {
 
 	data() {
 		return {
-			url: '/api/log',
+			url: '/api/access',
+			pageSize: 20,
 			filters: { date: this.$moment().format('YYYY-MM-DD') },
 			exportLabelBtn: 'EXPORT KE EXCEL',
 			requestInterval: null,
@@ -257,39 +277,20 @@ export default {
 	methods: {
 		addData() {
 			this.openForm({
-				att_date: this.$moment().format('YYYY-MM-DD'),
-				att_time: this.$moment().format('HH:mm'),
+				event_time_date: this.$moment().format('YYYY-MM-DD'),
+				event_time_time: this.$moment().format('HH:mm'),
 			})
 		},
 
-		exportToExcel() {
-			let data = []
-			this.exportLabelBtn = 'Menyiapkan File...'
-			this.loading = true
-
-			this.logs.forEach((a) => {
-				data.push({
-					Tanggal: a.att_date,
-					NIK: a.person_pin,
-					Nama: a.person_name + ' ' + a.person_last_name,
-					Departemen: a.dept_name,
-					Jam: a.att_time,
-					Gate: a.gate ? a.gate.name : '',
-				})
-			})
-
-			let fileName = 'log-absensi.xls'
-			let exportType = 'xls'
-			exportFromJSON({ data, fileName, exportType })
-			this.exportLabelBtn = 'EXPORT KE EXCEL'
-			this.loading = false
+		refreshData() {
+			this.page = 1
+			this.filters = { date: this.$moment().format('YYYY-MM-DD') }
+			this.requestData()
 		},
 	},
 
 	mounted() {
-		this.requestData()
-
-		// TODO: pake web socket
+		// TODO: pake web socket,
 	},
 }
 </script>
