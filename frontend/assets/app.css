@@ -120,48 +120,6 @@ table {
   word-break: normal;
 }
 
-.brand {
-  font-size: 22px;
-  margin-left: 20px;
-}
-
-.brand-box {
-  height: 150px;
-  background-color: #060446;
-  text-align: center;
-  color: #fff;
-}
-
-.btn-big {
-  font-size: 22px;
-}
-
-.el-header {
-  background-color: #254ec1;
-  color: #fff;
-  line-height: 60px;
-}
-
-.sidebar {
-  background-color: #060446;
-  border-color: #060446;
-  height: calc(100vh - 150px);
-  overflow: auto;
-}
-
-.sidebar:not(.el-menu--collapse) {
-  width: 200px;
-}
-
-.el-aside {
-  height: 100vh;
-  background-color: #060446;
-}
-
-.el-main {
-  background-color: #efefef;
-}
-
 .flex {
   display: flex;
 }
