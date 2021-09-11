@@ -26,4 +26,24 @@ class Person extends Model
     {
         return url(env('SERVER_ADDR', '10.4.21.111'), $value);
     }
+
+    /**
+     * Get the value indicating whether the IDs are incrementing.
+     *
+     * @return bool
+     */
+    public function getIncrementing()
+    {
+        return false;
+    }
+
+    /**
+     * Get the auto-incrementing key type.
+     *
+     * @return string
+     */
+    public function getKeyType()
+    {
+        return 'string';
+    }
 }
