@@ -13,13 +13,13 @@ class Person extends Model
 
     protected $with = ['department'];
 
-    protected $visible = ['id', 'pin', 'name', 'last_name', 'gender', 'department', 'photo_path', 'dept_id'];
+    protected $visible = ['id', 'pin', 'id_card', 'name', 'last_name', 'gender', 'department', 'photo_path', 'auth_dept_id'];
 
     public $timestamps = false;
 
     public function department()
     {
-        return $this->belongsTo(Department::class, 'dept_id');
+        return $this->belongsTo(Department::class, 'auth_dept_id');
     }
 
     public function getPhotoPathAttribute($value)
