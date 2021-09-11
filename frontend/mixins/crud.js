@@ -1,3 +1,5 @@
+import exportFromJSON from 'export-from-json'
+
 export default {
   data() {
     return {
@@ -136,22 +138,35 @@ export default {
       }
 
       this.loading = true
+
       this.$axios
         .$get(this.url, { params })
         .then((response) => {
           this.loading = false
-          this.tableData = response
 
           if (response.meta) {
             const { from, to, total } = response.meta
-            this.tableData = {
-              ...this.tableData,
-              from,
-              to,
-              total,
-            }
+            this.tableData = { data: response.data, from, to, total }
+          } else {
+            this.tableData = response
           }
         })
+        .finally(() => (this.loading = false))
+    },
+
+    exportData(fileName) {
+      let params = {
+        sort_prop: this.sort_prop,
+        sort_order: this.sort_order,
+        action: 'export',
+        ...this.filters,
+      }
+
+      this.loading = true
+
+      this.$axios
+        .$get(this.url, { params })
+        .then((data) => exportFromJSON({ data, fileName, exportType: 'xls' }))
         .finally(() => (this.loading = false))
     },
   },
