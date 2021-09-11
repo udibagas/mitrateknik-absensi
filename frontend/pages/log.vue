@@ -19,7 +19,7 @@
 						icon="el-icon-download"
 						type="primary"
 						:loading="loading"
-						@click="exportData('log-akses.xls')"
+						@click="exportData('log-akses')"
 						size="small"
 						title="EXPORT KE EXCEL"
 					>
@@ -61,7 +61,11 @@
 			@filter-change="filterChange"
 			height="calc(100vh - 235px)"
 		>
-			<el-table-column type="index" width="50" label="#"></el-table-column>
+			<el-table-column
+				type="index"
+				label="#"
+				:index="tableData.from"
+			></el-table-column>
 
 			<el-table-column prop="event_time" label="Tanggal" sortable width="120">
 				<template slot-scope="scope">
@@ -143,7 +147,7 @@
 			@size-change="sizeChange"
 			layout="total, sizes, prev, pager, next"
 			:page-size="pageSize"
-			:page-sizes="[20, 50, 100, 200, 500]"
+			:page-sizes="[15, 30, 50, 100]"
 			:total="tableData.total"
 		></el-pagination>
 
