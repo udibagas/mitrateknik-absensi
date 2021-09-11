@@ -8,7 +8,7 @@ class Area extends Model
 {
     protected $connection = 'pgsql';
 
-    protected $table = 'base_area';
+    protected $table = 'auth_area';
 
     protected $visible = ['id', 'name', 'code'];
 }
