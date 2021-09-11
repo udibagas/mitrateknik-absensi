@@ -8,7 +8,7 @@ class Department extends Model
 {
     protected $connection = 'pgsql';
 
-    protected $table = 'pers_department';
+    protected $table = 'auth_department';
 
     protected $visible = ['id', 'name', 'code'];
 }
