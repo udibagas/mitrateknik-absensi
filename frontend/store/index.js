@@ -50,7 +50,7 @@ export const actions = {
   },
 
   async getDepartments({ commit }) {
-    const data = await this.$axios.$get('/api/departmet')
+    const data = await this.$axios.$get('/api/department')
     commit('setDepartments', data)
   },
 
