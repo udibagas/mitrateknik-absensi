@@ -111,6 +111,8 @@ export default {
 	created() {
 		this.$store.dispatch('getGates')
 		this.$store.dispatch('getPersons')
+		this.$store.dispatch('getDepartments')
+
 		setInterval(() => {
 			this.timer = this.$moment().format('DD/MMM/YYYY HH:mm:ss')
 		}, 1000)
@@ -121,6 +123,7 @@ export default {
 <style scoped>
 /* .el-aside {
 	border-right: 1px solid #ddd;
+	background: #310064;
 } */
 
 /* .el-header {
@@ -132,7 +135,7 @@ export default {
 }
 
 .el-menu-item [class^='el-icon-'] {
-	font-size: 30px;
+	font-size: 22px;
 }
 
 .brand {
