@@ -36,7 +36,13 @@
 					:default-active="$route.path"
 					active-text-color="#FF5E0A"
 				>
-					<el-menu-item v-for="(m, i) in menus" :index="m.path" :key="i">
+					<el-menu-item
+						v-for="(m, i) in menus.filter((m) =>
+							!$auth.user.admin ? !m.admin_only : true
+						)"
+						:index="m.path"
+						:key="i"
+					>
 						<i :class="m.icon"></i>
 						<span slot="title">{{ m.label }}</span>
 					</el-menu-item>
@@ -72,7 +78,12 @@ export default {
 					path: '/',
 				},
 				{
-					label: 'LOG ABSENSI',
+					label: 'ABSENSI',
+					icon: 'el-icon-timer',
+					path: '/absensi',
+				},
+				{
+					label: 'LOG AKSES',
 					icon: 'el-icon-date',
 					path: '/log',
 				},
@@ -80,11 +91,13 @@ export default {
 					label: 'JAM KERJA',
 					icon: 'el-icon-alarm-clock',
 					path: '/time-slot',
+					admin_only: true,
 				},
 				{
 					label: 'USER',
 					icon: 'el-icon-user',
 					path: '/user',
+					admin_only: true,
 				},
 			],
 		}
