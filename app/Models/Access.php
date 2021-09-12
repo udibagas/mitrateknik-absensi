@@ -59,7 +59,8 @@ class Access extends Model
         'temperature',
         'vid_linkage_hanlde',
         'event_time_date',
-        'event_time_time'
+        'event_time_time',
+        'vid_linkage_handle'
     ];
 
     protected $appends = ['event_time_date', 'event_time_time'];
