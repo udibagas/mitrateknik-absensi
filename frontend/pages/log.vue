@@ -193,6 +193,7 @@
 					:class="{ 'is-error': formErrors.event_point_id }"
 				>
 					<el-select
+						:disabled="!!formModel.id"
 						placeholder="Gate"
 						v-model="formModel.event_point_id"
 						style="width: 100%"
@@ -217,10 +218,11 @@
 					:class="{ 'is-error': formErrors.event_time_date }"
 				>
 					<el-date-picker
+						:disabled="!!formModel.id"
 						v-model="formModel.event_time_date"
 						type="date"
 						value-format="yyyy-MM-dd"
-						format="dd-MM-yyyy"
+						format="dd-MMM-yyyy"
 						placeholder="Tanggal"
 						style="width: 100%"
 						:clearable="false"
@@ -250,7 +252,7 @@
 			<div slot="footer">
 				<el-button @click="closeForm"> BATAL </el-button>
 
-				<el-button type="primary" native-type="submit"> SIMPAN </el-button>
+				<el-button type="primary" @click="save"> SIMPAN </el-button>
 			</div>
 		</el-dialog>
 	</el-card>

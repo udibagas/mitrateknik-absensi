@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -44,7 +45,6 @@ class Access extends Model
         'verify_mode_name', // common_verifyMode_other
         'verify_mode_no', // 200
         'vid_linkage_hanlde' // snapshot wajah
-
     ];
 
     protected $visible = [
@@ -57,8 +57,12 @@ class Access extends Model
         'last_name',
         'pin',
         'temperature',
-        'vid_linkage_hanlde'
+        'vid_linkage_hanlde',
+        'event_time_date',
+        'event_time_time'
     ];
+
+    protected $appends = ['event_time_date', 'event_time_time'];
 
     // id: 8a84 95ef 7bbe 88f3 017b bf3b 2a1f 0709 created : 2021-09-07 14:48:50.845, event_time: 2021-09-07 12:03:31, 0x47cdb684f50d9d
     // id: 8a8495ef7bbe88f3017bbf3b2a 5d070b created : 2021-09-07 14:48:50.909, event_time: 2021-09-07 12:03:33
@@ -71,10 +75,40 @@ class Access extends Model
         return $this->belongsTo(Gate::class, 'event_point_id');
     }
 
+    public function getEventTimeDateAttribute()
+    {
+        return (new Carbon($this->event_time))->format('Y-m-d');
+    }
+
+    public function getEventTimeTimeAttribute()
+    {
+        return (new Carbon($this->event_time))->format('H:i:s');
+    }
+
     public static function booted()
     {
         static::creating(function ($model) {
-            $model->id = Str::uuid()->toString();
+            $model->id = str_replace('-', '', Str::uuid()->toString());
         });
+    }
+
+    /**
+     * Get the value indicating whether the IDs are incrementing.
+     *
+     * @return bool
+     */
+    public function getIncrementing()
+    {
+        return false;
+    }
+
+    /**
+     * Get the auto-incrementing key type.
+     *
+     * @return string
+     */
+    public function getKeyType()
+    {
+        return 'string';
     }
 }
