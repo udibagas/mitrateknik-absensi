@@ -44,7 +44,7 @@ class Access extends Model
         'unique_key', // CLWS211960023_157_2021-09-07 12:03:31, => [dev_sn]_[log_id]_[event_time]
         'verify_mode_name', // common_verifyMode_other
         'verify_mode_no', // 200
-        'vid_linkage_hanlde' // snapshot wajah
+        'vid_linkage_handle', // snapshot wajah
     ];
 
     protected $visible = [
@@ -68,8 +68,6 @@ class Access extends Model
     // id: 8a84 95ef 7bbe 88f3 017b bf3b 2a1f 0709 created : 2021-09-07 14:48:50.845, event_time: 2021-09-07 12:03:31, 0x47cdb684f50d9d
     // id: 8a8495ef7bbe88f3017bbf3b2a 5d070b created : 2021-09-07 14:48:50.909, event_time: 2021-09-07 12:03:33
     // id: 8a8495ef7bbf4e30017bbf62ec 28001b created : 2021-09-07 15:32:16.423, event_time: 2021-09-07 15:32:06
-
-    public $timestamps = false;
 
     public function gate()
     {
