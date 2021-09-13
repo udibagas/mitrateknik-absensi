@@ -62,7 +62,7 @@
 		>
 			<el-table-column type="index" width="50" label="#"></el-table-column>
 
-			<el-table-column prop="att_date" label="Tanggal" sortable width="105">
+			<el-table-column prop="att_date" label="Tanggal" sortable width="100">
 				<template slot-scope="{ row }">
 					{{ $moment(row.att_date).format('DD/MMM/YYYY') }} <br />
 					{{ $moment(row.att_date).format('dddd') }}
@@ -130,7 +130,7 @@
 			<el-table-column
 				prop="percentage"
 				label="%"
-				width="80"
+				width="70"
 				sortable
 				align="right"
 				header-align="right"
