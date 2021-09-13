@@ -1,17 +1,15 @@
 <template>
-	<div>
-		<div class="row">
-			<div class="col-md-3">
+	<el-dialog
+		:visible.sync="show"
+		width="95%"
+		center
+		title="DETAIL ABSENSI"
+		:before-close="(done) => $emit('close')"
+	>
+		<el-row :gutter="20">
+			<el-col :span="6">
 				<el-card :body-style="{ padding: '14px' }">
-					<img
-						:src="
-							base_url +
-							'/img/user-' +
-							(person.gender ? person.gender.toLowerCase() : '') +
-							'.png'
-						"
-						class="image"
-					/>
+					<img :src="person.photo_path" class="image" />
 					<div style="padding: 14px" class="text-center">
 						<h4 style="margin-bottom: 2px">
 							{{ person.name }} {{ person.last_name }}
@@ -22,9 +20,16 @@
 							>Dep. :
 							{{ person.department ? person.department.name : '' }}</span
 						>
-						<hr />
-						<h6 class="text-center">PRODUKTIFITAS RATA - RATA</h6>
-						<hr />
+						<h4
+							class="text-center"
+							style="
+								border-top: 1px solid #ddd;
+								border-bottom: 1px solid #ddd;
+								padding: 20px 0;
+							"
+						>
+							PRODUKTIFITAS RATA - RATA
+						</h4>
 						<div
 							:class="[
 								'text-center',
@@ -37,90 +42,90 @@
 						>
 							<el-row>
 								<el-col :span="12" style="border-right: 1px solid #eee">
-									<h3>{{ prodHourAvg }} jam</h3>
+									<h2>{{ prodHourAvg }} jam</h2>
 								</el-col>
 								<el-col :span="12">
-									<h3>{{ prodPercentAvg }}%</h3>
+									<h2>{{ prodPercentAvg }}%</h2>
 								</el-col>
 							</el-row>
 						</div>
 					</div>
 				</el-card>
-			</div>
-			<div class="col-md-9">
+			</el-col>
+			<el-col :span="18">
 				<v-chart :options="chartOption" class="echarts"></v-chart>
-			</div>
-		</div>
-		<hr />
+			</el-col>
+		</el-row>
 
-		<el-form :inline="true" style="float: right; clear: both">
+		<el-form inline style="float: right; clear: both">
 			<el-form-item>
 				<el-date-picker
-					v-model="filters.dateRange"
+					v-model="date"
 					type="daterange"
 					value-format="yyyy-MM-dd"
-					format="dd-MMM-yyyy"
+					format="dd/MMM/yyyy"
 					range-separator="-"
 					start-placeholder="Dari Tanggal"
 					end-placeholder="Sampai Tanggal"
-					@change="searchData"
+					@change="requestData"
+					size="small"
+					style="width: 280px; margin-top: 5px"
 				>
 				</el-date-picker>
 			</el-form-item>
-			<el-form-item style="padding-right: 0; margin-right: 0">
-				<el-button @click="exportToExcel" type="primary"
-					><i class="el-icon-document"></i> {{ exportLabelBtn }}</el-button
+
+			<el-form-item>
+				<el-button
+					size="small"
+					icon="el-icon-download"
+					@click="exportData"
+					type="primary"
 				>
+					EXPORT KE EXCEL
+				</el-button>
 			</el-form-item>
 		</el-form>
 
-		<el-table :data="tableData" stripe>
-			<el-table-column type="index" width="50"></el-table-column>
-			<el-table-column
-				prop="absence_date"
-				label="Tanggal"
-				sortable
-				width="100"
-			></el-table-column>
-			<el-table-column
-				prop="hari"
-				label="Hari"
-				sortable
-				width="100"
-			></el-table-column>
+		<el-table stripe :data="tableData" v-loading="loading">
+			<el-table-column type="index" width="50" label="#"></el-table-column>
+
+			<el-table-column prop="att_date" label="Tanggal" sortable>
+				<template slot-scope="scope">
+					{{ $moment(scope.row.att_date).format('DD/MMM/YYYY') }} <br />
+					{{ $moment(scope.row.att_date).format('dddd') }}
+				</template>
+			</el-table-column>
+
 			<el-table-column prop="first_in" label="Masuk" sortable></el-table-column>
+
 			<el-table-column label="Jam Istirahat" sortable>
-				<template slot-scope="scope">
-					{{ scope.row.rest_start }} - {{ scope.row.rest_end }}
+				<template slot-scope="{ row }">
+					{{ row.rest_start }} - {{ row.rest_end }} <br />
 				</template>
 			</el-table-column>
-			<el-table-column prop="istirahat" label="Lama Istirahat" sortable>
-				<template slot-scope="scope">
-					<span>{{ secToTime(scope.row.istirahat) }}</span>
-				</template>
+
+			<el-table-column label="Durasi Istirahat" prop="rest_duration" sortable>
 			</el-table-column>
-			<el-table-column
-				prop="last_out"
-				label="Pulang"
-				sortable
-			></el-table-column>
-			<el-table-column
-				prop="jam_kerja_efektif"
-				label="Jam Kerja Efektif"
-				sortable
-			>
-				<template slot-scope="scope">
-					{{ secToTime(scope.row.jam_kerja_efektif) }}
-				</template>
+
+			<el-table-column prop="last_out" label="Pulang" sortable>
 			</el-table-column>
+
+			<el-table-column prop="work_duration" label="Jam Kerja Efektif" sortable>
+			</el-table-column>
+
 			<el-table-column
-				prop="persentase"
+				prop="percentage"
 				label="%"
 				sortable
-				width="70"
-			></el-table-column>
+				align="right"
+				header-align="right"
+			>
+				<template slot-scope="{ row }">
+					{{ row.percentage.toFixed(2) }}
+				</template>
+			</el-table-column>
 		</el-table>
-	</div>
+	</el-dialog>
 </template>
 
 <script>
@@ -128,14 +133,19 @@ import exportFromJSON from 'export-from-json'
 import ECharts from 'vue-echarts/components/ECharts'
 import 'echarts/lib/chart/line'
 import 'echarts/lib/component/tooltip'
-// import 'echarts/lib/component/legend'
 import 'echarts/lib/component/title'
 
 export default {
 	components: { 'v-chart': ECharts },
-	props: ['person', 'period'],
+	props: ['person', 'period', 'show'],
+
 	watch: {
 		person(v, o) {
+			this.requestData()
+		},
+
+		period(v, o) {
+			this.date = this.period
 			this.requestData()
 		},
 	},
@@ -143,24 +153,17 @@ export default {
 	data() {
 		return {
 			url: '/api/absensi',
-			filters: { person_pin: this.person.pin },
-			exportLabelBtn: 'EXPORT KE EXCEL',
+			date: null,
+			loading: false,
+			tableData: [],
 			prodPercentAvg: 0,
 			prodHourAvg: 0,
 			chartOption: {
 				tooltip: {
 					trigger: 'axis',
-					// axisPointer: { type: 'shadow' }
 				},
-				// legend: {
-				//     x: 'right',
-				//     orient: 'vertical'
-				// },
 				grid: {
-					// right: '200px',
-					// left: '3%',
 					bottom: '30px',
-					// top: '15px',
 					containLabel: true,
 				},
 				title: {
@@ -182,7 +185,7 @@ export default {
 							position: 'top',
 							formatter: function (v) {
 								let tgl = v.name.split('\n')[0]
-								let pembagi = moment(tgl).day() === 5 ? 7 : 8
+								let pembagi = this.$moment(tgl).day() === 5 ? 7 : 8
 								return (
 									v.value +
 									' jam\n' +
@@ -196,6 +199,27 @@ export default {
 				],
 			},
 		}
+	},
+
+	methods: {
+		async requestData() {
+			this.loading = true
+			this.tableData = await this.$axios.$get(this.url, {
+				params: { date: this.date, pin: this.person.pin },
+			})
+			this.loading = false
+		},
+
+		async exportData(fileName) {
+			this.loading = true
+
+			const data = await this.$axios.$get(this.url, {
+				params: { date: this.date, pin: this.person.pin },
+			})
+
+			exportFromJSON({ data, fileName, exportType: 'xls' })
+			this.loading = false
+		},
 	},
 }
 </script>
