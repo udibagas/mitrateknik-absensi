@@ -1,5 +1,5 @@
 <template>
-	<div>test aja dari pages</div>
+	<div>TODO</div>
 </template>
 
 <script>
@@ -15,20 +15,20 @@ export default {
 
 	methods: {},
 
-	mounted() {
-		Echo.channel('attendance').listen('.log', (e) => {
-			// TODO: display popup
-			this.attendance = e.attTransaction
-			this.popup = true
+	// mounted() {
+	// 	Echo.channel('attendance').listen('.log', (e) => {
+	// 		// TODO: display popup
+	// 		this.attendance = e.attTransaction
+	// 		this.popup = true
 
-			setTimeout(() => {
-				this.popup = false
-			}, 5000)
-		})
-	},
+	// 		setTimeout(() => {
+	// 			this.popup = false
+	// 		}, 5000)
+	// 	})
+	// },
 
-	destroyed() {
-		Echo.leave('attendance')
-	},
+	// destroyed() {
+	// 	Echo.leave('attendance')
+	// },
 }
 </script>

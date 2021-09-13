@@ -79,17 +79,17 @@ export default {
 				},
 				{
 					label: 'ABSENSI',
-					icon: 'el-icon-timer',
+					icon: 'el-icon-alarm-clock',
 					path: '/absensi',
 				},
 				{
 					label: 'LOG AKSES',
-					icon: 'el-icon-date',
+					icon: 'el-icon-bell',
 					path: '/log',
 				},
 				{
 					label: 'JAM KERJA',
-					icon: 'el-icon-alarm-clock',
+					icon: 'el-icon-date',
 					path: '/time-slot',
 					admin_only: true,
 				},
