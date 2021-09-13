@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\TimeSlot;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -12,116 +13,123 @@ class AbsensiController extends Controller
 {
     public function index(Request $request)
     {
-        // Gate 1
-        //     IN: 14, OUT: 13
-        // Gate 2
-        //     IN: 16, OUT: 15
-        // Gate 3
-        //     IN: 3, OUT: 4
+        $sql = <<<SQL
+            SELECT
+                att_date,
+                MIN(att_time) AS first_in,
+                MAX(att_time) AS last_out,
+                EXTRACT(DOW FROM att_date) AS day,
+                (SELECT MIN(att_time) FROM log_akses
+                    WHERE pin = a.pin
+                        AND att_date = a.att_date
+                        AND gate ILIKE '%IN'
+                        AND att_time BETWEEN '11:30' AND '12:55'
+                ) AS rest_start,
+                (SELECT MIN(att_time) FROM log_akses
+                    WHERE pin = a.pin
+                        AND att_date = a.att_date
+                        AND gate ILIKE '%IN'
+                        AND att_time BETWEEN '12:30' AND '13:30'
+                ) AS rest_end,
+                fullname,
+                pin,
+                dept_name
+            FROM log_akses a
+            WHERE att_date BETWEEN :att_date_start AND :att_date_end
+        SQL;
 
-        $date_start = $request->date ? $request->date : date('Y-m-d');
-        $date_end = $request->date_end ? $request->date_end : date('Y-m-d');
-        $pin = $request->person_pin ? "person_pin = '{$request->person_pin}'" : "1 = 1";
+        if ($request->pin) {
+            $sql .= " AND pin = '{$request->pin}'";
+        }
 
-        $sql = "SELECT DISTINCT(att_date, person_pin) AS date_pin,
-            person_pin AS nik_var,
-            dept_name,
-            CONCAT(person_name, ' ', person_last_name) AS name_var,
-            att_date AS absence_date,
-            (SELECT att_time
-                FROM att_transaction
-                WHERE person_pin = a.person_pin AND att_date = a.att_date
-                    AND device_id IN (3, 14, 16)
-                ORDER BY att_time ASC LIMIT 1) AS first_in,
-            (SELECT att_time
-                FROM att_transaction
-                WHERE person_pin = a.person_pin AND att_date = a.att_date
-                    AND device_id IN (4, 13, 15)
-                ORDER BY att_time DESC LIMIT 1) AS last_out,
-            (SELECT att_time
-                FROM att_transaction
-                WHERE person_pin = a.person_pin AND att_date = a.att_date
-                    AND device_id IN (4, 13, 15)
-                    AND att_time BETWEEN '11:30' AND '12:55'
-                ORDER BY att_time ASC LIMIT 1) AS rest_start,
-            (SELECT att_time
-                FROM att_transaction
-                WHERE person_pin = a.person_pin AND att_date = a.att_date
-                    AND device_id IN (3, 14, 16)
-                    AND att_time BETWEEN '12:30' AND '13:30'
-                ORDER BY att_time ASC LIMIT 1) AS rest_end
-        FROM att_transaction a
-        WHERE att_date BETWEEN :att_date_start AND :att_date_end
-            AND person_pin != ''
-            AND $pin
-        ORDER BY att_date ASC, name_var ASC";
+        $sql .= " GROUP BY att_date, fullname, pin, dept_name";
 
-        $data = Attendance::where('person_pin', '!=', '')
-            ->when($request->person_pin, function ($q) use ($request) {
-                $q->where('person_pin', $request->person_pin);
-            })->whereBetween('att_date', [$date_start, $date_end])
-            ->orderBy('att_date', 'asc')
-            ->orderBy('person_name', 'asc')
-            ->get()->map(function ($item) {
-                return [
-                    'nik_var' => $item->person_pin,
-                    'dept_name' => $item->dept_name,
-                    'name_var' => $item->person_name . ' ' . $item->person_last_name,
-                    'absence_date' => $item->att_date,
-                    'device_id' => $item->device_id,
-                    'att_time' => $item->att_time
-                ];
-            });
-
-        return $data->unique(['absence_date', 'nik_var'])->map(function ($item) use ($data) {
-            $restStart0 = new Carbon('11:30');
-            $restStart1 = new Carbon('12:55');
-            $restEnd0 = new Carbon('12:30');
-            $restEnd1 = new Carbon('13:30');
-
-            $firstIn = $data->filter(function ($value) use ($item) {
-                return $value['nik_var'] == $item['nik_var'] &&
-                    in_array($value['device_id'], [3, 14, 16]) &&
-                    $value['absence_date'] == $item['absence_date'];
-            })->first();
-
-            $lastOut = $data->filter(function ($value) use ($item) {
-                return $value['nik_var'] == $item['nik_var'] &&
-                    in_array($value['device_id'], [4, 13, 15]) &&
-                    $value['absence_date'] == $item['absence_date'];
-            })->last();
-
-            $restStart = $data->filter(function ($value) use ($item, $restStart0, $restStart1) {
-                $attTime = new Carbon($value['att_time']);
-                return $value['nik_var'] == $item['nik_var'] &&
-                    in_array($value['device_id'], [4, 13, 15]) &&
-                    $value['absence_date'] == $item['absence_date'] &&
-                    $attTime->between($restStart0, $restStart1);
-            })->last();
-
-            $restEnd = $data->filter(function ($value) use ($item, $restEnd0, $restEnd1) {
-                $attTime = new Carbon($value['att_time']);
-                return $value['nik_var'] == $item['nik_var'] &&
-                    in_array($value['device_id'], [3, 14, 16]) &&
-                    $value['absence_date'] == $item['absence_date'] &&
-                    $attTime->between($restEnd0, $restEnd1);
-            })->last();
-
-            return [
-                'nik_var' => $item['nik_var'],
-                'dept_name' => $item['dept_name'],
-                'name_var' => $item['name_var'],
-                'absence_date' => $item['absence_date'],
-                'first_in' => $firstIn ? $firstIn['att_time'] : '',
-                'last_out' => $lastOut ? $lastOut['att_time'] : '',
-                'rest_start' => $restStart ? $restStart['att_time'] : '',
-                'rest_end' => $restEnd ? $restEnd['att_time'] : '',
-            ];
-        })->toArray();
-
-        return DB::connection('pgsql')->select($sql, [
-            ':att_date_start' => $date_start,
-            ':att_date_end' => $date_end
+        $data = DB::connection('pgsql')->select($sql, [
+            ':att_date_start' => $request->date[0],
+            ':att_date_end' => $request->date[1]
         ]);
+
+        $slot = [];
+        $timeSlot = TimeSlot::all();
+
+        foreach ($timeSlot as $ts) {
+            $slot[$ts->day] = $ts;
+        }
+
+        $data = array_map(function ($item) use ($slot) {
+            $slot = $slot[$item->day];
+
+            if (!$item->rest_start) {
+                $item->rest_start = $slot->rest_start;
+            }
+
+            if (!$item->rest_end) {
+                $item->rest_end = $slot->rest_end;
+            }
+
+            if ($item->first_in && $item->last_out) {
+                $slot_in            = new Carbon($slot->in);
+                $slot_out           = new Carbon($slot->out);
+                $slot_rest_start    = new Carbon($slot->rest_start);
+                $slot_rest_end      = new Carbon($slot->rest_end);
+
+                $first_in   = new Carbon($item->first_in);
+                $last_out   = new Carbon($item->last_out);
+                $rest_start = new Carbon($item->rest_start);
+                $rest_end   = new Carbon($item->rest_end);
+
+                $jamMasukEfektif            = $first_in > $slot_in ? $first_in : $slot_in;
+                $jamKeluarEfektif           = $last_out < $slot_out ? $last_out : $slot_out;
+                $jamMulaiIstirahatEfektif   = $rest_start < $slot_rest_start ? $rest_start : $slot_rest_start;
+                $jamSelesaiIstirahatEfektif = $rest_end > $slot_rest_end ? $rest_end : $slot_rest_end;
+
+                $restDuration = $jamSelesaiIstirahatEfektif->diffInSeconds($jamMulaiIstirahatEfektif);
+                $workDuration = $jamKeluarEfektif->diffInSeconds($jamMasukEfektif);
+
+                $item->rest_duration = static::secToTime($restDuration);
+                // TODO: harusnya kalau start kerja > jam istirahat keluar gak dikurangi
+                $item->work_duration = static::secToTime($workDuration - $restDuration);
+                $item->percentage    = ($workDuration - $restDuration) / ($slot->jam_kerja_max * 36);
+            }
+
+            // $item->rest_start       = substr($item->rest_start, 0, 5);
+            // $item->rest_end         = substr($item->rest_end, 0, 5);
+            // $item->first_in         = substr($item->first_in, 0, 5);
+            // $item->last_out         = substr($item->last_out, 0, 5);
+            // $item->rest_duration    = substr($item->rest_duration, 0, 5);
+            // $item->work_duration    = substr($item->work_duration, 0, 5);
+
+            return $item;
+        }, $data);
+
+        if ($request->action == 'export') {
+            return array_map(function ($item) {
+                $days = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', "JUM'AT", 'SABTU'];
+
+                return [
+                    'Tanggal' => $item->att_date,
+                    'Hari' => $days[$item->day],
+                    'Masuk' => $item->first_in,
+                    'Jam Istirahat' => "{$item->rest_start} - {$item->rest_end}",
+                    'Lama Istirahat' => $item->rest_duration,
+                    'Pulang' => $item->last_out,
+                    'Jam Kerja Efektif' => $item->work_duration,
+                    'Persentase' => round($item->percentage, 2),
+                ];
+            }, $data);
+        }
+
+        return $data;
+    }
+
+    protected static function secToTime($seconds)
+    {
+        $h = floor($seconds / 3600);
+        $m = floor(($seconds % 3600) / 60);
+        $s = $seconds % 60;
+
+        return str_pad($h, 2, '0', STR_PAD_LEFT) . ':'
+            . str_pad($m, 2, '0', STR_PAD_LEFT) . ':'
+            . str_pad($s, 2, '0', STR_PAD_LEFT);
     }
 }

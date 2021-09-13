@@ -13,7 +13,20 @@ class Person extends Model
 
     protected $with = ['department'];
 
-    protected $visible = ['id', 'pin', 'id_card', 'name', 'last_name', 'gender', 'department', 'photo_path', 'auth_dept_id'];
+    protected $visible = [
+        'id',
+        'pin',
+        'id_card',
+        'name',
+        'last_name',
+        'gender',
+        'department',
+        'photo_path',
+        'auth_dept_id',
+        'initial_name'
+    ];
+
+    protected $appends = ['initial_name'];
 
     public $timestamps = false;
 
@@ -24,7 +37,22 @@ class Person extends Model
 
     public function getPhotoPathAttribute($value)
     {
-        return url(env('SERVER_ADDR', '10.4.21.111'), $value);
+        if (!$value) {
+            return url("/images/user-" . strtolower($this->gender) . ".png");
+        }
+
+        return env('SERVER_ABSENSI', 'http://10.4.21.111:8089') . $value;
+    }
+
+    public function getInitialNameAttribute()
+    {
+        $firstInitial = substr($this->name, 0, 1);
+
+        if (!$this->last_name) {
+            return $firstInitial;
+        }
+
+        return $firstInitial . substr($this->last_name, 0, 1);
     }
 
     /**

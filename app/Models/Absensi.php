@@ -10,6 +10,10 @@ class Absensi extends Model
 {
     use HasFactory;
 
+    protected $connection = 'pgsql';
+
+    protected $table = 'log_akses';
+
     protected $fillable = [
         'person_pin',
         'person_name',
