@@ -42,6 +42,10 @@ class AbsensiController extends Controller
             $sql .= " AND pin = '{$request->pin}'";
         }
 
+        if ($request->keyword) {
+            $sql .= " AND (fullname ILIKE '%{$request->keyword}%' OR pin ILIKE '%{$request->keyword}%')";
+        }
+
         $sql .= " GROUP BY att_date, fullname, pin, dept_name";
 
         $data = DB::connection('pgsql')->select($sql, [
