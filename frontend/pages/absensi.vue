@@ -59,6 +59,7 @@
 			v-loading="loading"
 			height="calc(100vh - 190px)"
 			@row-dbclick="(row) => showDetail(row)"
+			@filter-change="filterChange"
 		>
 			<el-table-column type="index" width="50" label="#"></el-table-column>
 
@@ -91,6 +92,7 @@
 			<el-table-column
 				prop="dept_name"
 				label="Departemen"
+				column-key="dept_name"
 				:filters="departments.map((d) => ({ value: d.name, text: d.name }))"
 				sortable
 			></el-table-column>
@@ -185,6 +187,11 @@ export default {
 		showDetail(row) {
 			this.selectedData = this.persons.find((p) => p.pin === row.pin)
 			this.dialog = true
+		},
+
+		filterChange(filter) {
+			this.filters = { ...this.filters, ...filter }
+			this.requestData()
 		},
 
 		refreshData() {
