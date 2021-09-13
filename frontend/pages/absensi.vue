@@ -62,7 +62,7 @@
 		>
 			<el-table-column type="index" width="50" label="#"></el-table-column>
 
-			<el-table-column prop="att_date" label="Tanggal" sortable width="110">
+			<el-table-column prop="att_date" label="Tanggal" sortable width="105">
 				<template slot-scope="{ row }">
 					{{ $moment(row.att_date).format('DD/MMM/YYYY') }} <br />
 					{{ $moment(row.att_date).format('dddd') }}
@@ -99,7 +99,7 @@
 				prop="first_in"
 				label="Masuk"
 				sortable
-				width="100"
+				width="95"
 			></el-table-column>
 
 			<el-table-column label="Jam Istirahat" sortable width="150">
@@ -116,7 +116,7 @@
 			>
 			</el-table-column>
 
-			<el-table-column prop="last_out" label="Pulang" sortable width="100">
+			<el-table-column prop="last_out" label="Pulang" sortable width="95">
 			</el-table-column>
 
 			<el-table-column
@@ -130,7 +130,7 @@
 			<el-table-column
 				prop="percentage"
 				label="%"
-				width="100"
+				width="80"
 				sortable
 				align="right"
 				header-align="right"
