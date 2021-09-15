@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Access;
 use App\Models\AttTransaction;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -15,16 +16,16 @@ class AttendanceEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $attTransaction;
+    public $access;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(AttTransaction $attTransaction)
+    public function __construct(Access $access)
     {
-        $this->attTransaction = $attTransaction->load(['person']);
+        $this->access = $access;
     }
 
     /**
@@ -34,7 +35,7 @@ class AttendanceEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('attendance.' . $this->attTransaction->device_id);
+        return new Channel('log');
     }
 
     public function broadcastAs()

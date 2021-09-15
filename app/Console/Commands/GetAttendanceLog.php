@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Events\AttendanceEvent;
-use App\Models\AttTransaction;
+use App\Models\Access;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -14,14 +14,14 @@ class GetAttendanceLog extends Command
      *
      * @var string
      */
-    protected $signature = 'attendance:get';
+    protected $signature = 'log:get';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Get attendance';
+    protected $description = 'Get log';
 
     /**
      * Create a new command instance.
@@ -41,20 +41,23 @@ class GetAttendanceLog extends Command
     public function handle()
     {
         while (true) {
-            // cukup yg di gate in aja
-            $logs = AttTransaction::distinct('device_id')
-                ->whereHas('person')
-                ->where('att_date', date('Y-m-d'))
-                ->whereIn('device_id', [3, 14, 16])
-                ->get()
-                ->filter(function ($item) {
-                    return (new Carbon(now()))->diffInSeconds(new Carbon($item->att_datetime)) < 3;
-                });
+            $log = Access::whereNotNull('pin')
+                ->whereNotNull('name')
+                ->where('pin', '!=', '')
+                ->where('name', '!=', '')
+                ->whereDate('event_time', date('Y-m-d')) // biar leboh spesifik
+                ->latest()
+                ->first();
 
-            foreach ($logs as $log) {
-                $this->line("Send {$log->person_name} info to device {$log->device_id}");
+            if ($log && (new Carbon(now()))->diffInSeconds(new Carbon($log->event_time)) < 3) {
+                $this->line("Send {$log->name} info to screen");
                 // kalau id-nya sudah pernah tampil gak perlu di broadcast
                 AttendanceEvent::dispatch($log);
+                sleep(1);
+            } else {
+                // sleep 0.1 second
+                $this->line('No new data');
+                usleep(200000);
             }
         }
     }
