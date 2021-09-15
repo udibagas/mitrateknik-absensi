@@ -4,8 +4,8 @@ window.Pusher = require('pusher-js')
 
 window.Echo = new Echo({
   broadcaster: 'pusher',
-  key: 'pusher_key_123',
-  // wsHost: '10.4.21.112',
+  // key: 'pusher_key_123',
+  wsHost: '10.4.21.112',
   wsHost: '127.0.0.1',
   wsPort: 6001,
   forceTLS: false,
