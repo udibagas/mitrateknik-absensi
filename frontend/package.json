@@ -19,8 +19,8 @@
     "vue-echarts": "^6.0.0-rc.6"
   },
   "devDependencies": {
+    "@nuxtjs/composition-api": "^0.29.0",
     "@nuxtjs/moment": "^1.6.1",
-    "@vue/composition-api": "^1.0.4",
     "eslint-config-prettier": "^8.3.0",
     "laravel-echo": "^1.11.2",
     "prettier": "^2.3.2",
