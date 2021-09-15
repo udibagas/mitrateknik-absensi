@@ -116,7 +116,7 @@
 			@size-change="sizeChange"
 			layout="total, sizes, prev, pager, next"
 			:page-size="pageSize"
-			:page-sizes="[10, 25, 50, 100]"
+			:page-sizes="[10, 20, 50]"
 			:total="tableData.total"
 		></el-pagination>
 

@@ -147,7 +147,7 @@
 			@size-change="sizeChange"
 			layout="total, sizes, prev, pager, next"
 			:page-size="pageSize"
-			:page-sizes="[15, 30, 50, 100]"
+			:page-sizes="[10, 20, 50]"
 			:total="tableData.total"
 		></el-pagination>
 
@@ -272,7 +272,6 @@ export default {
 	data() {
 		return {
 			url: '/api/access',
-			pageSize: 20,
 			filters: { date: this.$moment().format('YYYY-MM-DD') },
 			exportLabelBtn: 'EXPORT KE EXCEL',
 			requestInterval: null,
