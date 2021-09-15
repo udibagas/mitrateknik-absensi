@@ -63,10 +63,12 @@ class AbsensiController extends Controller
         $total = count($data);
 
         // apply pagination
-        $page       = $request->page ?: 1;
-        $pageSize   = $request->pageSize ?: 10;
-        $offset     = ($page - 1) * $pageSize;
-        $data       = array_splice($data, $offset, $pageSize);
+        if ($request->paginated) {
+            $page       = $request->page ?: 1;
+            $pageSize   = $request->pageSize ?: 10;
+            $offset     = ($page - 1) * $pageSize;
+            $data       = array_splice($data, $offset, $pageSize);
+        }
 
         // get timeslot setting for calculation
         $slot       = [];
@@ -108,8 +110,10 @@ class AbsensiController extends Controller
 
                 $item->rest_duration = static::secToTime($restDuration);
                 // TODO: harusnya kalau start kerja > jam istirahat keluar gak dikurangi
-                $item->work_duration = static::secToTime($workDuration - $restDuration);
-                $item->percentage    = ($workDuration - $restDuration) / ($slot->jam_kerja_max * 36);
+                $actualWorkDuration     = $workDuration - $restDuration;
+                $item->actual_work_duration = $actualWorkDuration;
+                $item->work_duration    = static::secToTime($actualWorkDuration);
+                $item->percentage       = ($actualWorkDuration) / ($slot->jam_kerja_max * 36);
             }
 
             // $item->rest_start       = substr($item->rest_start, 0, 5);
@@ -139,11 +143,15 @@ class AbsensiController extends Controller
             }, $data);
         }
 
-        return [
-            'data' => $data,
-            'total' => $total,
-            'from' => $offset + 1,
-        ];
+        if ($request->paginated) {
+            return [
+                'data' => $data,
+                'total' => $total,
+                'from' => $offset + 1,
+            ];
+        }
+
+        return $data;
     }
 
     protected static function secToTime($seconds)
