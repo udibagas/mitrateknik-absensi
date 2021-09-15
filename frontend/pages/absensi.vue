@@ -55,13 +55,18 @@
 
 		<el-table
 			stripe
-			:data="tableData"
+			:data="tableData.data"
 			v-loading="loading"
-			height="calc(100vh - 190px)"
+			height="calc(100vh - 237px)"
 			@row-dbclick="(row) => showDetail(row)"
 			@filter-change="filterChange"
 		>
-			<el-table-column type="index" width="50" label="#"></el-table-column>
+			<el-table-column
+				type="index"
+				width="50"
+				label="#"
+				:index="tableData.from"
+			></el-table-column>
 
 			<el-table-column prop="att_date" label="Tanggal" sortable width="100">
 				<template slot-scope="{ row }">
@@ -143,6 +148,19 @@
 			</el-table-column>
 		</el-table>
 
+		<br />
+
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 20, 50]"
+			:total="tableData.total"
+		></el-pagination>
+
 		<AbsensiPegawai
 			v-if="dialog"
 			:show="dialog"
@@ -154,17 +172,20 @@
 </template>
 
 <script>
-import exportFromJSON from 'export-from-json'
+// import exportFromJSON from 'export-from-json'
 import { mapState } from 'vuex'
+import crud from '~/mixins/crud'
 
 export default {
+	mixins: [crud],
+
 	computed: {
 		...mapState(['persons', 'departments']),
 	},
 
-	mounted() {
-		this.requestData()
-	},
+	// mounted() {
+	// 	this.requestData()
+	// },
 
 	data() {
 		return {
@@ -189,11 +210,6 @@ export default {
 			this.dialog = true
 		},
 
-		filterChange(filter) {
-			this.filters = { ...this.filters, ...filter }
-			this.requestData()
-		},
-
 		refreshData() {
 			this.filters = {
 				date: [
@@ -201,29 +217,22 @@ export default {
 					this.$moment().format('YYYY-MM-DD'),
 				],
 				keyword: '',
+				page: 1,
 			}
 
 			this.requestData()
 		},
 
-		async requestData() {
-			this.loading = true
-			this.tableData = await this.$axios.$get(this.url, {
-				params: { ...this.filters },
-			})
-			this.loading = false
-		},
+		// async exportData(fileName) {
+		// 	this.loading = true
 
-		async exportData(fileName) {
-			this.loading = true
+		// 	const data = await this.$axios.$get(this.url, {
+		// 		params: { ...this.filters, action: 'export' },
+		// 	})
 
-			const data = await this.$axios.$get(this.url, {
-				params: { ...this.filters, action: 'export' },
-			})
-
-			exportFromJSON({ data, fileName, exportType: 'xls' })
-			this.loading = false
-		},
+		// 	exportFromJSON({ data, fileName, exportType: 'xls' })
+		// 	this.loading = false
+		// },
 	},
 }
 </script>

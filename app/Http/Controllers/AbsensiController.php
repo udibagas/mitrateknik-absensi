@@ -56,13 +56,24 @@ class AbsensiController extends Controller
 
         $sql .= " GROUP BY att_date, fullname, pin, dept_name";
 
+        // TODO: apply pagination
+
         $data = DB::connection('pgsql')->select($sql, [
             ':att_date_start' => $request->date[0],
             ':att_date_end' => $request->date[1]
         ]);
 
-        $slot = [];
-        $timeSlot = TimeSlot::all();
+        $total = count($data);
+
+        // apply pagination
+        $page       = $request->page ?: 1;
+        $pageSize   = $request->pageSize ?: 10;
+        $offset     = ($page - 1) * $pageSize;
+        $data       = array_splice($data, $offset, $pageSize);
+
+        // get timeslot setting for calculation
+        $slot       = [];
+        $timeSlot   = TimeSlot::all();
 
         foreach ($timeSlot as $ts) {
             $slot[$ts->day] = $ts;
@@ -131,7 +142,11 @@ class AbsensiController extends Controller
             }, $data);
         }
 
-        return $data;
+        return [
+            'data' => $data,
+            'total' => $total,
+            'from' => $offset + 1,
+        ];
     }
 
     protected static function secToTime($seconds)
