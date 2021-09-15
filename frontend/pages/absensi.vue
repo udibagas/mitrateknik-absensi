@@ -12,7 +12,7 @@
 						range-separator="-"
 						start-placeholder="Dari Tanggal"
 						end-placeholder="Sampai Tanggal"
-						@change="requestData"
+						@change="searchData"
 						size="small"
 						style="margin-top: 5px; width: 240px"
 						:clearable="false"
@@ -36,7 +36,7 @@
 						prefix-icon="el-icon-search"
 						v-model="filters.keyword"
 						size="small"
-						@change="requestData"
+						@change="searchData"
 						clearable
 					>
 					</el-input>
@@ -159,6 +159,7 @@
 			:page-size="pageSize"
 			:page-sizes="[10, 20, 50]"
 			:total="tableData.total"
+			:current-page="page"
 		></el-pagination>
 
 		<AbsensiPegawai
@@ -172,7 +173,6 @@
 </template>
 
 <script>
-// import exportFromJSON from 'export-from-json'
 import { mapState } from 'vuex'
 import crud from '~/mixins/crud'
 
@@ -182,10 +182,6 @@ export default {
 	computed: {
 		...mapState(['persons', 'departments']),
 	},
-
-	// mounted() {
-	// 	this.requestData()
-	// },
 
 	data() {
 		return {
@@ -222,17 +218,6 @@ export default {
 
 			this.requestData()
 		},
-
-		// async exportData(fileName) {
-		// 	this.loading = true
-
-		// 	const data = await this.$axios.$get(this.url, {
-		// 		params: { ...this.filters, action: 'export' },
-		// 	})
-
-		// 	exportFromJSON({ data, fileName, exportType: 'xls' })
-		// 	this.loading = false
-		// },
 	},
 }
 </script>
