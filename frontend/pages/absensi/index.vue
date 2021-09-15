@@ -58,7 +58,7 @@
 			:data="tableData.data"
 			v-loading="loading"
 			height="calc(100vh - 237px)"
-			@row-dbclick="(row) => showDetail(row)"
+			@row-dbclick="(row) => $router.push(`/absensi/${row.pin}`)"
 			@filter-change="filterChange"
 		>
 			<el-table-column
@@ -82,13 +82,11 @@
 				show-overflow-tooltip
 			>
 				<template slot-scope="{ row }">
-					<a
-						href="#"
+					<nuxt-link
 						style="text-decoration: none"
-						@click.prevent="showDetail(row)"
+						:to="`/absensi/${row.pin}`"
+						>{{ row.fullname }}</nuxt-link
 					>
-						{{ row.fullname }}
-					</a>
 					<br />
 					NIK : {{ row.pin }}
 				</template>
@@ -161,14 +159,6 @@
 			:total="tableData.total"
 			:current-page="page"
 		></el-pagination>
-
-		<AbsensiPegawai
-			v-if="dialog"
-			:show="dialog"
-			:person="selectedData"
-			:period="filters.date"
-			@close="dialog = false"
-		/>
 	</el-card>
 </template>
 
@@ -186,10 +176,6 @@ export default {
 	data() {
 		return {
 			url: '/api/absensi',
-			dialog: false,
-			tableData: [],
-			selectedData: {},
-			loading: false,
 			filters: {
 				date: [
 					this.$moment().format('YYYY-MM-DD'),
@@ -201,11 +187,6 @@ export default {
 	},
 
 	methods: {
-		showDetail(row) {
-			this.selectedData = this.persons.find((p) => p.pin === row.pin)
-			this.dialog = true
-		},
-
 		refreshData() {
 			this.filters = {
 				date: [
