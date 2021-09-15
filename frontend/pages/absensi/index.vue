@@ -60,6 +60,7 @@
 			height="calc(100vh - 237px)"
 			@row-dbclick="(row) => $router.push(`/absensi/${row.pin}`)"
 			@filter-change="filterChange"
+			@sort-change="sortChange"
 		>
 			<el-table-column
 				type="index"
@@ -68,7 +69,12 @@
 				:index="tableData.from"
 			></el-table-column>
 
-			<el-table-column prop="att_date" label="Tanggal" sortable width="100">
+			<el-table-column
+				prop="att_date"
+				label="Tanggal"
+				sortable="custom"
+				width="100"
+			>
 				<template slot-scope="{ row }">
 					{{ $moment(row.att_date).format('DD/MMM/YYYY') }} <br />
 					{{ $moment(row.att_date).format('dddd') }}
@@ -97,17 +103,17 @@
 				label="Departemen"
 				column-key="dept_name"
 				:filters="departments.map((d) => ({ value: d.name, text: d.name }))"
-				sortable
+				sortable="custom"
 			></el-table-column>
 
 			<el-table-column
 				prop="first_in"
 				label="Masuk"
-				sortable
+				sortable="custom"
 				width="95"
 			></el-table-column>
 
-			<el-table-column label="Jam Istirahat" sortable width="150">
+			<el-table-column label="Jam Istirahat" width="150">
 				<template slot-scope="{ row }">
 					{{ row.rest_start }} - {{ row.rest_end }}
 				</template>
@@ -116,19 +122,22 @@
 			<el-table-column
 				label="Durasi Istirahat"
 				prop="rest_duration"
-				sortable
 				width="150"
 			>
 			</el-table-column>
 
-			<el-table-column prop="last_out" label="Pulang" sortable width="95">
+			<el-table-column
+				prop="last_out"
+				label="Pulang"
+				sortable="custom"
+				width="95"
+			>
 			</el-table-column>
 
 			<el-table-column
 				prop="work_duration"
 				label="Jam Kerja Efektif"
 				width="160"
-				sortable
 			>
 			</el-table-column>
 
@@ -136,7 +145,6 @@
 				prop="percentage"
 				label="%"
 				width="70"
-				sortable
 				align="right"
 				header-align="right"
 			>

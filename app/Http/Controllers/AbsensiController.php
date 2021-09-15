@@ -55,6 +55,10 @@ class AbsensiController extends Controller
 
         $sql .= " GROUP BY att_date, fullname, pin, dept_name";
 
+        if ($request->sort_prop && $request->sort_order) {
+            $sql .= " ORDER BY {$request->sort_prop} {$request->sort_order}";
+        }
+
         $data = DB::connection('pgsql')->select($sql, [
             ':att_date_start' => $request->date[0],
             ':att_date_end' => $request->date[1]
