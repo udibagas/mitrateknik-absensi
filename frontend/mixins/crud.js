@@ -6,6 +6,7 @@ export default {
       showForm: false,
       formErrors: {},
       formModel: {},
+      paginated: true,
       page: 1,
       pageSize: 10,
       tableData: {},
@@ -92,6 +93,10 @@ export default {
       // please override
     },
 
+    afterGet() {
+      // please override
+    },
+
     deleteData(id) {
       this.$confirm('Anda yakin akan menghapus data ini?', 'Warning', {
         type: 'warning',
@@ -133,7 +138,7 @@ export default {
         pageSize: this.pageSize,
         sort_prop: this.sort_prop,
         sort_order: this.sort_order,
-        paginated: true,
+        paginated: this.paginated,
         ...this.filters,
       }
 
@@ -150,6 +155,8 @@ export default {
           } else {
             this.tableData = response
           }
+
+          this.afterGet()
         })
         .finally(() => (this.loading = false))
     },
