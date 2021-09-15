@@ -118,6 +118,7 @@
 			:page-size="pageSize"
 			:page-sizes="[10, 20, 50]"
 			:total="tableData.total"
+			:current-page="page"
 		></el-pagination>
 
 		<el-dialog
