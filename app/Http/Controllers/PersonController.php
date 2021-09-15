@@ -12,4 +12,9 @@ class PersonController extends Controller
     {
         return Person::orderBy('name', 'ASC')->get();
     }
+
+    public function getByPin($pin)
+    {
+        return Person::with('department')->wherePin($pin)->first();
+    }
 }
