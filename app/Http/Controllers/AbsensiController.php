@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Attendance;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\TimeSlot;
@@ -55,8 +54,6 @@ class AbsensiController extends Controller
         }
 
         $sql .= " GROUP BY att_date, fullname, pin, dept_name";
-
-        // TODO: apply pagination
 
         $data = DB::connection('pgsql')->select($sql, [
             ':att_date_start' => $request->date[0],
