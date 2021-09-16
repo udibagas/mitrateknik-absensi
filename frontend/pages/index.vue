@@ -13,6 +13,7 @@
 					<img
 						:src="access.vid_linkage_handle || person.photo_path"
 						class="image"
+						referrerpolicy="no-referrer"
 					/>
 
 					<div
