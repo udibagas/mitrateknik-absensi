@@ -49,7 +49,7 @@ class GetAttendanceLog extends Command
                 ->latest()
                 ->first();
 
-            if ($log && (new Carbon(now()))->diffInSeconds(new Carbon($log->event_time)) < 3) {
+            if ($log && (new Carbon(now()))->diffInSeconds(new Carbon($log->event_time)) <= 5) {
                 $this->line("Send {$log->name} info to screen");
                 // kalau id-nya sudah pernah tampil gak perlu di broadcast
                 AttendanceEvent::dispatch($log);
