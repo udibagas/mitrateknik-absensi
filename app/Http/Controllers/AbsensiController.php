@@ -131,19 +131,30 @@ class AbsensiController extends Controller
         }, $data);
 
         if ($request->action == 'export') {
-            return array_map(function ($item) {
+            return array_map(function ($item) use ($request) {
                 $days = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', "JUM'AT", 'SABTU'];
 
-                return [
+                $data = [
                     'Tanggal' => $item->att_date,
                     'Hari' => $days[$item->day],
+                ];
+
+                if (!$request->pin) {
+                    $data = array_merge($data, [
+                        'Nama' => $item->fullname,
+                        'NIK' => $item->pin,
+                        'Departmen' => $item->dept_name
+                    ]);
+                }
+
+                return array_merge($data, [
                     'Masuk' => $item->first_in,
                     'Jam Istirahat' => "{$item->rest_start} - {$item->rest_end}",
                     'Lama Istirahat' => $item->rest_duration,
                     'Pulang' => $item->last_out,
                     'Jam Kerja Efektif' => $item->work_duration,
-                    'Persentase' => round($item->percentage, 2),
-                ];
+                    'Persentase' => round($item->percentage, 2)
+                ]);
             }, $data);
         }
 
