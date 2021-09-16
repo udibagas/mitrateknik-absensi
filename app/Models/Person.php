@@ -41,7 +41,7 @@ class Person extends Model
             return url("/images/user-" . strtolower($this->gender) . ".png");
         }
 
-        return env('SERVER_ABSENSI', 'http://10.4.21.111:8089') . $value;
+        return env('SERVER_ABSENSI', 'http://10.4.21.111:8098') . $value;
     }
 
     public function getInitialNameAttribute()
