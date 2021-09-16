@@ -1,0 +1,13 @@
+[Unit]
+Description=Queue Service
+Requires=network.target
+
+[Service]
+User=www-data
+WorkingDirectory=/home/[user]/apps/absensi-kai
+ExecStart=/usr/bin/php artisan queue:work
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
