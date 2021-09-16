@@ -2,7 +2,11 @@
 	<div>
 		<div style="display: flex">
 			<el-card style="width: 320px; margin-right: 10px; flex-shrink: 0">
-				<img :src="person.photo_path" class="image" />
+				<img
+					:src="person.photo_path"
+					class="image"
+					referrerpolicy="no-referrer"
+				/>
 
 				<h3 style="margin-bottom: 2px" class="text-center">
 					{{ person.name }} {{ person.last_name }}
