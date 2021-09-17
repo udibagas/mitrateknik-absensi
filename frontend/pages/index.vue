@@ -1,119 +1,173 @@
 <template>
 	<div>
-		<el-dialog v-if="person.id" :visible.sync="popup" fullscreen>
-			<div class="flex" slot="title">
-				<img src="/images/logo.jpeg" style="height: 55px" alt />
-				<div class="brand">UPT BALAI YASA TEGAL</div>
+		<el-card
+			:body-style="{ padding: '10px 0 10px 20px' }"
+			style="margin-bottom: 10px"
+		>
+			<div
+				class="flex"
+				style="align-items: center; justify-content: space-between"
+			>
+				<strong> DASHBOARD </strong>
+				<el-form inline>
+					<el-form-item style="margin-bottom: 0">
+						<el-select
+							placeholder="Departemen"
+							v-model="filters.dept_name"
+							filterable
+							default-first-option
+							clearable
+							style="width: 320px"
+							@change="requestData"
+						>
+							<el-option
+								v-for="(d, i) in departments"
+								:value="d.name"
+								:label="d.name"
+								:key="i"
+							></el-option>
+						</el-select>
+					</el-form-item>
+					<el-form-item style="margin-bottom: 0">
+						<el-date-picker
+							v-model="filters.date"
+							type="daterange"
+							value-format="yyyy-MM-dd"
+							format="dd/MMM/yyyy"
+							range-separator="-"
+							start-placeholder="Dari Tanggal"
+							end-placeholder="Sampai Tanggal"
+							:clearable="false"
+							@change="requestData"
+						>
+						</el-date-picker>
+					</el-form-item>
+				</el-form>
 			</div>
-			<div style="display: flex">
-				<el-card
-					style="width: 400px; margin-right: 10px; flex-shrink: 0"
-					class="text-center"
-				>
-					<img
-						:src="access.vid_linkage_handle || person.photo_path"
-						class="image"
-						referrerpolicy="no-referrer"
-					/>
+		</el-card>
 
+		<el-row :gutter="10" v-loading="loading">
+			<el-col :span="8">
+				<el-card>
+					<div slot="header" class="text-center">PRODUKTIFITAS RATA - RATA</div>
 					<div
-						style="margin: 20px 0 10px 0; font-size: 30px; font-weight: bold"
+						:class="[
+							'text-center',
+							tableData.productivity_avg_in_percent >= 90
+								? 'text-success'
+								: tableData.productivity_avg_in_percent >= 60
+								? 'text-warning'
+								: 'text-danger',
+						]"
 					>
-						{{ person.name }} {{ person.last_name }}
-					</div>
-
-					<div style="font-size: 25px; margin-bottom: 10px">
-						{{ person.pin }}
-					</div>
-					<div style="font-size: 20px">
-						Dep. : {{ person.department ? person.department.name : '' }}
-					</div>
-				</el-card>
-
-				<el-card class="right-section">
-					<div style="margin-bottom: 25px">
-						<i class="el-icon-time orange"></i>
-						{{ $moment(access.event_time).format('HH:mm:ss') }}
-					</div>
-					<div style="margin-bottom: 25px">
-						<i class="el-icon-timer orange"></i>
-						(+/-)x menit
-					</div>
-					<div>
-						<i class="el-icon-user orange"></i>
-						{{ access.temperature || '-' }} &deg;C
+						<el-row>
+							<el-col :span="12" style="border-right: 1px solid #eee">
+								<div style="font-size: 40px">
+									{{ tableData.productivity_avg_in_hour }} jam
+								</div>
+							</el-col>
+							<el-col :span="12">
+								<div style="font-size: 40px">
+									{{ tableData.productivity_avg_in_percent }}%
+								</div>
+							</el-col>
+						</el-row>
 					</div>
 				</el-card>
-			</div>
-		</el-dialog>
+			</el-col>
+
+			<el-col :span="8">
+				<el-card :body-style="{ padding: 0 }">
+					<div
+						slot="header"
+						class="flex"
+						style="justify-content: space-between; align-items: center"
+					>
+						PEGAWAI TERPRODUKTIF
+						<el-button
+							icon="el-icon-download"
+							size="small"
+							title="Download"
+							@click="
+								exportData(
+									'pegawai-terproduktif',
+									tableData.pegawai_terproduktif
+								)
+							"
+						></el-button>
+					</div>
+					<EmployeeList :data="tableData.pegawai_terproduktif" />
+				</el-card>
+			</el-col>
+
+			<el-col :span="8">
+				<el-card :body-style="{ padding: 0 }">
+					<div
+						slot="header"
+						class="flex"
+						style="justify-content: space-between; align-items: center"
+					>
+						PEGAWAI TIDAK PRODUKTIF
+						<el-button
+							icon="el-icon-download"
+							size="small"
+							title="Download"
+							@click="
+								exportData(
+									'pegawai-tidak-produktif',
+									tableData.pegawai_tidak_produktif
+								)
+							"
+						></el-button>
+					</div>
+					<EmployeeList :data="tableData.pegawai_tidak_produktif" />
+				</el-card>
+			</el-col>
+		</el-row>
 	</div>
 </template>
 
 <script>
+import exportFromJSON from 'export-from-json'
+import { mapState } from 'vuex'
+import crud from '~/mixins/crud'
+
 export default {
-	layout: 'default',
+	mixins: [crud],
+
+	computed: {
+		...mapState(['departments']),
+	},
 
 	data() {
 		return {
-			popup: false,
-			access: {},
-			person: {},
+			url: '/api/absensi',
+			filters: {
+				summary: true,
+				date: [
+					this.$moment().format('YYYY-MM-01'),
+					this.$moment().format('YYYY-MM-DD'),
+				],
+			},
+			paginated: '',
 		}
 	},
 
-	methods: {},
-
-	mounted() {
-		Echo.channel('log').listen('.log', (e) => {
-			// display only when new data
-			if (this.access.id != e.access.id) {
-				this.access = e.access
-				this.person =
-					this.$store.state.persons.find((p) => p.pin == e.access.pin) || {}
-
-				// TODO: kalau antara jam < jam 10 & dari gate masuk & first record asumsi absen berangkat
-			}
-
-			if (!this.popup) {
-				this.popup = true
-			}
-
-			setTimeout(() => {
-				if (this.popup) {
-					this.popup = false
-				}
-			}, 3000)
-		})
-	},
-
-	destroyed() {
-		Echo.leave('log')
+	methods: {
+		exportData(fileName, data) {
+			console.log(data)
+			exportFromJSON({
+				fileName,
+				exportType: 'xls',
+				data: data.map((d) => ({
+					NIK: d.pin,
+					Nama: d.fullname,
+					Departemen: d.dept_name,
+					'Jam kerja Efektif': d.work_duration,
+					Prosentase: d.percentage.toFixed(2),
+				})),
+			})
+		},
 	},
 }
 </script>
-
-<style lang="css" scoped>
-.image {
-	width: 100%;
-}
-
-.right-section {
-	flex-grow: 1;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	justify-items: center;
-	font-size: 100px;
-	padding-left: 60px;
-}
-
-.brand {
-	font-size: 24px;
-	line-height: 60px;
-	margin-left: 10px;
-}
-
-.orange {
-	color: #ff5e0a;
-}
-</style>

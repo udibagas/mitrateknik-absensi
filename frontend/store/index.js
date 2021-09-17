@@ -1,5 +1,4 @@
 export const state = () => ({
-  navigationList: [],
   areas: [],
   departments: [],
   devices: [],
@@ -9,10 +8,6 @@ export const state = () => ({
 })
 
 export const mutations = {
-  setNavigationList(state, data) {
-    state.navigationList = data
-  },
-
   setAreas(state, data) {
     state.areas = data
   },
@@ -39,11 +34,6 @@ export const mutations = {
 }
 
 export const actions = {
-  async getNavigationList({ commit }) {
-    const data = await this.$axios.$get('/api/getNavigation')
-    commit('setNavigationList', data)
-  },
-
   async getAreas({ commit }) {
     const data = await this.$axios.$get('/api/area')
     commit('setAreas', data)

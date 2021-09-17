@@ -33,10 +33,10 @@
 					<i class="el-icon-time orange"></i>
 					{{ $moment(access.event_time).format('HH:mm:ss') }}
 				</div>
-				<div style="margin-bottom: 25px">
+				<!-- <div style="margin-bottom: 25px">
 					<i class="el-icon-timer orange"></i>
 					(+/-)x menit
-				</div>
+				</div> -->
 				<div>
 					<i class="el-icon-user orange"></i>
 					{{ access.temperature || '-' }} &deg;C
@@ -60,8 +60,7 @@ export default {
 		Echo.channel('log').listen('.log', (e) => {
 			// display only when new data
 			if (this.access.id != e.access.id) {
-				console.log('new data')
-				this.$emit('new-log')
+				this.$emit('new-data')
 				this.access = e.access
 				this.person =
 					this.$store.state.persons.find((p) => p.pin == e.access.pin) || {}

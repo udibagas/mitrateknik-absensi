@@ -67,7 +67,12 @@
 				:index="tableData.from"
 			></el-table-column>
 
-			<el-table-column prop="event_time" label="Tanggal" sortable width="120">
+			<el-table-column
+				prop="event_time"
+				label="Tanggal"
+				sortable="custom"
+				min-width="120"
+			>
 				<template slot-scope="scope">
 					{{ $moment(scope.row.event_time).format('DD-MMM-YYYY') }}
 				</template>
@@ -77,7 +82,7 @@
 				prop="pin"
 				label="NIK"
 				sortable="custom"
-				width="100"
+				min-width="100"
 			></el-table-column>
 
 			<el-table-column
@@ -102,7 +107,12 @@
 				:filters="departments.map((d) => ({ text: d.name, value: d.name }))"
 			></el-table-column>
 
-			<el-table-column prop="event_time" label="Jam" sortable width="100">
+			<el-table-column
+				prop="event_time"
+				label="Jam"
+				sortable="custom"
+				min-width="100"
+			>
 				<template slot-scope="scope">
 					{{ $moment(scope.row.event_time).format('HH:mm:ss') }}
 				</template>
@@ -111,7 +121,7 @@
 			<el-table-column
 				prop="event_point_name"
 				label="Gate"
-				sortable
+				sortable="custom"
 				min-width="150"
 				show-overflow-tooltip
 			></el-table-column>
@@ -256,6 +266,8 @@
 				<el-button type="primary" @click="save"> SIMPAN </el-button>
 			</div>
 		</el-dialog>
+
+		<Absen @new-data="refreshData" />
 	</el-card>
 </template>
 
