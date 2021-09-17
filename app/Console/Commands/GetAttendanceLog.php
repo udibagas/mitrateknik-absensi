@@ -6,6 +6,7 @@ use App\Events\AttendanceEvent;
 use App\Models\Access;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use stdClass;
 
 class GetAttendanceLog extends Command
 {
@@ -40,24 +41,38 @@ class GetAttendanceLog extends Command
      */
     public function handle()
     {
-        while (true) {
-            $log = Access::whereNotNull('pin')
-                ->whereNotNull('name')
-                ->where('pin', '!=', '')
-                ->where('name', '!=', '')
-                ->whereDate('event_time', date('Y-m-d')) // biar leboh spesifik
-                ->latest()
-                ->first();
+        $lastData = new stdClass();
+        $lastData->id = '0';
+        $lastData->event_time = null;
 
-            if ($log && (new Carbon(now()))->diffInSeconds(new Carbon($log->event_time)) <= 5) {
-                $this->line("Send {$log->name} info to screen");
-                // kalau id-nya sudah pernah tampil gak perlu di broadcast
-                AttendanceEvent::dispatch($log);
-                sleep(1);
-            } else {
-                // sleep 0.1 second
-                $this->line('No new data');
-                usleep(200000);
+        while (true) {
+            try {
+                $log = Access::whereNotNull('pin')
+                    ->whereNotNull('name')
+                    ->where('pin', '!=', '')
+                    ->where('name', '!=', '')
+                    ->whereDate('event_time', date('Y-m-d')) // biar lebih spesifik
+                    ->where('id', '!=', $lastData->id) // kalau id-nya sudah pernah tampil gak perlu di broadcast
+                    ->when($lastData->event_time, function ($q) use ($lastData) {
+                        $q->where('event_time', '>', $lastData->event_time);
+                    })->orderBy('event_time', 'desc')->first();
+
+                if ($log && (new Carbon(now()))->diffInSeconds(new Carbon($log->event_time)) <= 3) {
+                    // set new value
+                    $lastData = $log;
+                    $this->line("Send {$log->name} info to screen {$log->event_time}");
+                    AttendanceEvent::dispatch($log);
+                    usleep(200000); //0.2 sec
+                } else {
+                    $this->line('No new data');
+                    usleep(200000); //0.2 sec
+                }
+            } catch (\Exception $e) {
+                $this->error($e->getMessage());
+                $lastData = new stdClass();
+                $lastData->id = '0';
+                $lastData->event_time = null;
+                continue;
             }
         }
     }
