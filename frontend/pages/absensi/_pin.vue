@@ -1,7 +1,10 @@
 <template>
 	<div>
 		<div style="display: flex">
-			<el-card style="width: 320px; margin-right: 10px; flex-shrink: 0">
+			<el-card
+				style="width: 320px; margin-right: 10px; flex-shrink: 0"
+				:body-style="{ padding: '0 0 20px 0' }"
+			>
 				<img
 					:src="person.photo_path"
 					class="image"
