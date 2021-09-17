@@ -46,11 +46,15 @@ class AbsensiController extends Controller
         }
 
         if ($request->dept_name) {
-            $deptName = implode(',', array_map(function ($item) {
-                return "'{$item}'";
-            }, $request->dept_name));
+            if (is_array($request->dept_name)) {
+                $deptName = implode(',', array_map(function ($item) {
+                    return "'{$item}'";
+                }, $request->dept_name));
 
-            $sql .= " AND dept_name IN ({$deptName})";
+                $sql .= " AND dept_name IN ({$deptName})";
+            } else {
+                $sql .= " AND dept_name = '{$request->dept_name}'";
+            }
         }
 
         $sql .= " GROUP BY att_date, fullname, pin, dept_name";
@@ -163,6 +167,23 @@ class AbsensiController extends Controller
                 'data' => $data,
                 'total' => $total,
                 'from' => $offset + 1,
+            ];
+        }
+
+        if ($request->summary) {
+            $avgHour = array_reduce($data, function ($total, $current) {
+                return $total + $current->actual_work_duration;
+            }, 0) / count($data);
+
+            $avgPercent = array_reduce($data, function ($total, $current) {
+                return $total + $current->percentage;
+            }, 0) / count($data);
+
+            return [
+                'productivity_avg_in_hour' => round($avgHour / 3600, 2),
+                'productivity_avg_in_percent' => round($avgPercent, 2),
+                'pegawai_terproduktif' => collect($data)->sortBy('actual_work_duration', SORT_REGULAR, true)->take(5)->values(),
+                'pegawai_tidak_produktif' => collect($data)->sortBy('actual_work_duration', SORT_REGULAR, false)->take(5)->values(),
             ];
         }
 
