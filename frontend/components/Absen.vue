@@ -75,6 +75,7 @@ export default {
 		})
 
 		this.echo.channel('log').listen('.log', (e) => {
+			this.$emit('new-data')
 			this.access = e.access
 			this.person = this.persons.find((p) => p.pin == e.access.pin) || {}
 
