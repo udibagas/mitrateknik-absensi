@@ -86,7 +86,7 @@ export default {
 				if (this.popup) {
 					this.popup = false
 				}
-			}, 3000)
+			}, 5000)
 		})
 	},
 
