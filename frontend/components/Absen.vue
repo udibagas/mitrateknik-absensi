@@ -11,7 +11,7 @@
 				:body-style="{ padding: '0 0 20px 0' }"
 			>
 				<img
-					:src="access.vid_linkage_handle || person.photo_path"
+					:src="access.photo_path || person.photo_path"
 					class="image"
 					referrerpolicy="no-referrer"
 				/>

@@ -62,6 +62,7 @@ class GetAttendanceLog extends Command
                 if ($log && (new Carbon(now()))->diffInSeconds(new Carbon($log->event_time)) <= 5) {
                     // set new value
                     $lastData = $log;
+                    $log->photo_path = env('SERVER_ABSENSI', 'http://10.4.21.111:8098') . $log->vid_linkage_handle;
                     $this->line("Send {$log->name} info to screen {$log->event_time}");
                     AttendanceEvent::dispatch($log);
                     usleep(200000); //0.2 sec
