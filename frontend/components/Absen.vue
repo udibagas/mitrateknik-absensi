@@ -24,22 +24,26 @@
 					{{ person.pin }}
 				</div>
 				<div style="font-size: 20px">
-					Dep. : {{ person.department ? person.department.name : '' }}
+					{{ person.department ? person.department.name : '' }}
 				</div>
 			</el-card>
 
 			<el-card class="right-section">
 				<div style="margin-bottom: 25px">
-					<i class="el-icon-time orange"></i>
+					<i class="el-icon-time grey"></i>
 					{{ $moment(access.event_time).format('HH:mm:ss') }}
 				</div>
 				<!-- <div style="margin-bottom: 25px">
-					<i class="el-icon-timer orange"></i>
+					<i class="el-icon-timer grey"></i>
 					(+/-)x menit
 				</div> -->
 				<div>
-					<i class="el-icon-user orange"></i>
+					<i class="el-icon-user grey"></i>
 					{{ access.temperature || '-' }} &deg;C
+				</div>
+
+				<div style="font-size: 50px; margin-top: 50px">
+					PRODUKTIVITAS ANDA : xx%
 				</div>
 			</el-card>
 		</div>
@@ -47,26 +51,32 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
 	data() {
 		return {
 			popup: false,
 			access: {},
 			person: {},
+			echo: null,
 		}
 	},
 
-	mounted() {
-		Echo.channel('log').listen('.log', (e) => {
-			// display only when new data
-			if (this.access.id != e.access.id) {
-				this.$emit('new-data')
-				this.access = e.access
-				this.person =
-					this.$store.state.persons.find((p) => p.pin == e.access.pin) || {}
+	computed: {
+		...mapState(['persons']),
+	},
 
-				// TODO: kalau antara jam < jam 10 & dari gate masuk & first record asumsi absen berangkat
-			}
+	mounted() {
+		this.echo = this.$echo({
+			key: 'pusher_key_123',
+			// host: '127.0.0.1',
+			host: '10.4.21.112',
+			port: 6001,
+		})
+
+		this.echo.channel('log').listen('.log', (e) => {
+			this.access = e.access
+			this.person = this.persons.find((p) => p.pin == e.access.pin) || {}
 
 			if (!this.popup) {
 				this.popup = true
@@ -81,7 +91,7 @@ export default {
 	},
 
 	destroyed() {
-		Echo.leave('log')
+		this.echo.leave('log')
 	},
 }
 </script>
@@ -100,6 +110,11 @@ export default {
 	justify-items: center;
 	font-size: 100px;
 	padding-left: 60px;
+	/* hijau */
+	background-color: rgb(159, 255, 122);
+	/* merah */
+	/* background-color: rgb(255, 108, 108); */
+	/* background-color: gold; */
 }
 
 .brand {
@@ -108,7 +123,8 @@ export default {
 	margin-left: 10px;
 }
 
-.orange {
-	color: #ff5e0a;
+.grey {
+	/* color: #ff5e0a; */
+	color: grey;
 }
 </style>

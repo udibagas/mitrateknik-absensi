@@ -17,7 +17,7 @@
 
 				<div style="font-size: 1.5em" class="text-center">{{ person.pin }}</div>
 				<div class="text-center">
-					Dep. : {{ person.department ? person.department.name : '' }}
+					{{ person.department ? person.department.name : '' }}
 				</div>
 
 				<h4

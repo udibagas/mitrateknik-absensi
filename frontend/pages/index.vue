@@ -168,6 +168,10 @@ export default {
 				})),
 			})
 		},
+
+		requestData() {
+			return false
+		},
 	},
 }
 </script>

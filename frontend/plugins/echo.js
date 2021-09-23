@@ -1,13 +1,28 @@
 import Echo from 'laravel-echo'
-
 window.Pusher = require('pusher-js')
 
-window.Echo = new Echo({
-  broadcaster: 'pusher',
-  key: 'pusher_key_123',
-  wsHost: '10.4.21.112',
-  // wsHost: '127.0.0.1',
-  wsPort: 6001,
-  forceTLS: false,
-  disableStats: true,
-})
+export default ({ app, $axios }, inject) => {
+  inject('echo', (config) => {
+    return new Echo({
+      broadcaster: 'pusher',
+      key: config.key,
+      wsHost: config.host,
+      wsPort: config.port,
+      forceTLS: false,
+      disableStats: true,
+      authorizer: (channel, options) => {
+        return {
+          authorize: (socketId, callback) => {
+            $axios
+              .$post('/api/broadcasting/auth', {
+                socket_id: socketId,
+                channel_name: channel.name,
+              })
+              .then((response) => callback(false, response))
+              .catch((error) => callback(true, error))
+          },
+        }
+      },
+    })
+  })
+}

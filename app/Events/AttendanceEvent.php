@@ -18,6 +18,10 @@ class AttendanceEvent implements ShouldBroadcast
 
     public $access;
 
+    public $percentage;
+
+    public $late;
+
     /**
      * Create a new event instance.
      *
@@ -26,6 +30,10 @@ class AttendanceEvent implements ShouldBroadcast
     public function __construct(Access $access)
     {
         $this->access = $access;
+
+        // TODO: passing prosentase jika > jam 17.00
+        // $this->percentage = compact('hour', 'percent');
+        // passing terlambat berapa menit jika pertama kali absen
     }
 
     /**

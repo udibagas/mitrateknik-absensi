@@ -12,6 +12,7 @@ class AbsensiController extends Controller
 {
     public function index(Request $request)
     {
+        // TODO: ini slow sekali untuk perhitungan
         $sql = <<<SQL
             SELECT
                 att_date,

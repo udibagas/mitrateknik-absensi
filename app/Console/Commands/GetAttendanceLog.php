@@ -51,13 +51,15 @@ class GetAttendanceLog extends Command
                     ->whereNotNull('name')
                     ->where('pin', '!=', '')
                     ->where('name', '!=', '')
-                    ->whereDate('event_time', date('Y-m-d')) // biar lebih spesifik
+                    ->whereRaw('LENGTH(pin)=5')
                     ->where('id', '!=', $lastData->id) // kalau id-nya sudah pernah tampil gak perlu di broadcast
+                    ->whereDate('event_time', date('Y-m-d')) // biar lebih spesifik
                     ->when($lastData->event_time, function ($q) use ($lastData) {
                         $q->where('event_time', '>', $lastData->event_time);
-                    })->orderBy('event_time', 'desc')->first();
+                    })
+                    ->orderBy('event_time', 'desc')->first();
 
-                if ($log && (new Carbon(now()))->diffInSeconds(new Carbon($log->event_time)) <= 3) {
+                if ($log && (new Carbon(now()))->diffInSeconds(new Carbon($log->event_time)) <= 5) {
                     // set new value
                     $lastData = $log;
                     $this->line("Send {$log->name} info to screen {$log->event_time}");
