@@ -46,25 +46,29 @@ class GetAttendanceLog extends Command
         $lastData->id = '0';
         $lastData->event_time = null;
         $lastData->event_point_name = null;
+        $ids = [];
+
+        // harus bisa ambil data langsung beberapa tanpa duplicate
 
         while (true) {
             try {
-                $log = Access::whereNotNull('pin')
-                    ->whereNotNull('name')
-                    ->where('pin', '!=', '')
+                $logs = Access::whereNotNull('name')
                     ->where('name', '!=', '')
                     ->whereRaw('LENGTH(pin)=5')
-                    ->where('id', '!=', $lastData->id) // kalau id-nya sudah pernah tampil gak perlu di broadcast
-                    // ->whereDate('event_time', date('Y-m-d')) // biar lebih spesifik
+                    ->when(count($ids) > 0, function ($q) use ($ids) {
+                        $q->whereNotIn('id', $ids);
+                    })
+                    ->whereDate('event_time', date('Y-m-d')) // biar lebih spesifik
                     ->when($lastData->event_time, function ($q) use ($lastData) {
                         $q->where('event_time', '>', $lastData->event_time);
                     })
-                    ->when($lastData->event_point_name, function ($q) use ($lastData) {
-                        $q->where('event_point_name', '!=', $lastData->event_point_name);
-                    })
-                    ->orderBy('event_time', 'asc')->first();
+                    ->orderBy('event_time', 'asc')->get();
 
-                if ($log) {
+                // set value for ids to be excluded on next iteration
+                $ids = $logs->pluck('id')->all();
+
+                foreach ($logs as $log) {
+                    $lastData = $log;
                     // ambil data attendace untuk user & tanggal terkait
                     $attendance = Attendance::where('pin', $log->pin)->where('date', $log->event_time_date)->first();
                     $gate = strtoupper(substr($log->event_point_name, -2));
@@ -107,9 +111,7 @@ class GetAttendanceLog extends Command
                         }
                     }
 
-                    if ((new Carbon(now()))->diffInSeconds(new Carbon($log->event_time)) <= 60) {
-                        // set new value
-                        $lastData = $log;
+                    if ((new Carbon(now()))->diffInSeconds(new Carbon($log->event_time)) <= 30) {
                         // $this->line($log);
                         $this->line("Name = {$log->name}");
                         $this->line("Time = {$log->event_time}");
@@ -120,8 +122,6 @@ class GetAttendanceLog extends Command
                         $this->line('--------------------------------------');
                         AttendanceEvent::dispatch($log, $gate == 'IN' ? 'IN' : 'OUT', $attendance->prosentase, $attendance->late, $first_in);
                     }
-                } else {
-                    $this->line('No new data');
                 }
 
                 usleep(0.2 * 1000000); //0.2 sec
