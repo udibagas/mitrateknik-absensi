@@ -34,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('department', [DepartmentController::class, 'index']);
     // Route::get('absensi', [AbsensiController::class, 'index']);
     Route::get('attendance', [AttendaceController::class, 'index']);
+    Route::get('summary', [AttendaceController::class, 'summary']);
     Route::get('person', [PersonController::class, 'index']);
     Route::get('person/{pin}', [PersonController::class, 'getByPin']);
     Route::get('device', [DeviceController::class, 'index']);

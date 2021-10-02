@@ -51,6 +51,11 @@ class AttendaceController extends Controller
         return $data->get();
     }
 
+    public function summary(Request $request)
+    {
+        // TODO
+    }
+
     protected static function secToTime($seconds)
     {
         $h = floor($seconds / 3600);
