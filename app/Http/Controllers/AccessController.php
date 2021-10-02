@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AccessRequest;
 use App\Models\Access;
 use App\Models\AccReader;
+use App\Models\Attendance;
 use App\Models\Department;
 use App\Models\Gate;
 use App\Models\Person;
@@ -93,8 +94,49 @@ class AccessController extends Controller
             'verify_mode_no' => 200,
         ];
 
-        $data = Access::create($input);
-        return ['message' => 'Data telah disimpan', 'data' => $data];
+        $log = Access::create($input);
+
+        // proses data attendance
+        $attendance = Attendance::where('pin', $log->pin)->where('date', $log->event_time_date)->first();
+        $gate = strtoupper(substr($log->event_point_name, -2));
+
+        // kalau gak ada anggap aja sebagai first_in
+        if (!$attendance) {
+            $attendance = Attendance::create([
+                'date' => $log->event_time_date,
+                'pin' => $log->pin,
+                'name' => "{$log->name} {$log->last_name}",
+                'department' => $log->dept_name,
+                'first_in' => $log->event_time_time
+            ]);
+        } else {
+            // jika lewat gate out
+            if ($gate == 'UT') {
+                $data = ['last_out' => $log->event_time_time];
+
+                // jika di range waktu istirahat
+                if ((new Carbon($log->event_time))->between(
+                    new Carbon("{$log->event_time_date} 11:30:00"),
+                    new Carbon("{$log->event_time_date} 12:55:00"),
+                )) {
+                    $data['rest_start'] = $log->event_time_time;
+                }
+
+                $attendance->update($data);
+            }
+
+            // jika lewat gate in
+            if ($gate == 'IN') {
+                if ((new Carbon($log->event_time))->between(
+                    new Carbon("{$log->event_time_date} 12:30:00"),
+                    new Carbon("{$log->event_time_date} 13:30:00"),
+                )) {
+                    $attendance->update(['rest_end' => $log->event_time_time]);
+                }
+            }
+        }
+
+        return ['message' => 'Data telah disimpan', 'data' => $log];
     }
 
     public function update(Access $access, AccessRequest $request)
