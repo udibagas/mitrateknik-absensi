@@ -42,9 +42,7 @@ class MigrateData extends Command
     {
         Attendance::truncate();
 
-        $logs = Access::whereNotNull('pin')
-            ->whereNotNull('name')
-            ->where('pin', '!=', '')
+        $logs = Access::whereNotNull('name')
             ->where('name', '!=', '')
             ->whereRaw('LENGTH(pin)=5')
             ->orderBy('event_time', 'asc')->get();
