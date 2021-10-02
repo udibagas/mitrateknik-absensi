@@ -13,7 +13,7 @@
 					<el-form-item style="margin-bottom: 0">
 						<el-select
 							placeholder="Departemen"
-							v-model="filters.dept_name"
+							v-model="filters.department"
 							filterable
 							default-first-option
 							clearable
@@ -47,8 +47,8 @@
 		</el-card>
 
 		<el-row :gutter="10" v-loading="loading">
-			<el-col :span="8">
-				<el-card>
+			<el-col :span="24">
+				<el-card style="margin-bottom: 10px">
 					<div slot="header" class="text-center">PRODUKTIFITAS RATA - RATA</div>
 					<div
 						:class="[
@@ -76,14 +76,16 @@
 				</el-card>
 			</el-col>
 
-			<el-col :span="8">
+			<el-col :span="12">
 				<el-card :body-style="{ padding: 0 }">
 					<div
 						slot="header"
 						class="flex"
 						style="justify-content: space-between; align-items: center"
 					>
-						PEGAWAI TERPRODUKTIF
+						<span style="color: green; font-weight: bold">
+							PEGAWAI TERPRODUKTIF
+						</span>
 						<el-button
 							icon="el-icon-download"
 							size="small"
@@ -100,14 +102,16 @@
 				</el-card>
 			</el-col>
 
-			<el-col :span="8">
+			<el-col :span="12">
 				<el-card :body-style="{ padding: 0 }">
 					<div
 						slot="header"
 						class="flex"
 						style="justify-content: space-between; align-items: center"
 					>
-						PEGAWAI TIDAK PRODUKTIF
+						<span style="color: red; font-weight: bold">
+							PEGAWAI TIDAK PRODUKTIF
+						</span>
 						<el-button
 							icon="el-icon-download"
 							size="small"
@@ -141,7 +145,7 @@ export default {
 
 	data() {
 		return {
-			url: '/api/absensi',
+			url: '/api/attendance',
 			filters: {
 				summary: true,
 				date: [
@@ -161,16 +165,12 @@ export default {
 				exportType: 'xls',
 				data: data.map((d) => ({
 					NIK: d.pin,
-					Nama: d.fullname,
-					Departemen: d.dept_name,
+					Nama: d.name,
+					Departemen: d.department,
 					'Jam kerja Efektif': d.work_duration,
-					Prosentase: d.percentage.toFixed(2),
+					Prosentase: d.prosentase,
 				})),
 			})
-		},
-
-		requestData() {
-			return false
 		},
 	},
 }

@@ -151,7 +151,8 @@ class Attendance extends Model
 
     public function getProsentaseAttribute()
     {
-        return round(($this->jam_kerja_efektif / ($this->jam_kerja_max * 36)), 2);
+        $jamKerjaMax = $this->jam_kerja_max ?: 8;
+        return round(($this->jam_kerja_efektif / ($jamKerjaMax * 36)), 2);
     }
 
     public function getWorkDurationAttribute()

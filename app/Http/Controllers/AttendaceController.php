@@ -14,7 +14,11 @@ class AttendaceController extends Controller
         })->when($request->keyword, function ($q) use ($request) {
             $q->where('keyword', 'LIKE', "%{$request->keyword}%");
         })->when($request->department, function ($q) use ($request) {
-            $q->whereIn('department', $request->department);
+            if (is_array($request->department)) {
+                $q->whereIn('department', $request->department);
+            } else {
+                $q->where('department', $request->department);
+            }
         })->whereBetween('date', $request->date)
             ->orderBy($request->sort_prop ?: 'name', $request->sort_order ?: 'asc');
 
@@ -48,12 +52,16 @@ class AttendaceController extends Controller
             });
         }
 
-        return $data->get();
-    }
+        if ($request->summary) {
+            return [
+                'productivity_avg_in_hour' => round($data->get()->avg('jam_kerja_efektif') / 3600, 2),
+                'productivity_avg_in_percent' => round($data->get()->avg('prosentase'), 2),
+                'pegawai_terproduktif' => $data->get()->sortBy('jam_kerja_efektif', SORT_REGULAR, true)->take(5)->values(),
+                'pegawai_tidak_produktif' => $data->get()->sortBy('jam_kerja_efektif', SORT_REGULAR, false)->take(5)->values(),
+            ];
+        }
 
-    public function summary(Request $request)
-    {
-        // TODO
+        return $data->get();
     }
 
     protected static function secToTime($seconds)
