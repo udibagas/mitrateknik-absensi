@@ -56,7 +56,6 @@
 		<el-table
 			stripe
 			:data="tableData.data"
-			v-loading="loading"
 			@sort-change="sortChange"
 			@filter-change="filterChange"
 			height="calc(100vh - 235px)"

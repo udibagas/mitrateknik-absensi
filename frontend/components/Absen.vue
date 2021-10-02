@@ -32,18 +32,46 @@
 				<div style="margin-bottom: 25px">
 					<i class="el-icon-time grey"></i>
 					{{ $moment(access.event_time).format('HH:mm:ss') }}
-				</div>
-				<!-- <div style="margin-bottom: 25px">
-					<i class="el-icon-timer grey"></i>
-					(+/-)x menit
-				</div> -->
-				<div>
-					<i class="el-icon-user grey"></i>
-					{{ access.temperature || '-' }} &deg;C
+					<span style="color: red" v-if="late && first_in">
+						(+{{ late }} mnt)
+					</span>
 				</div>
 
-				<div style="font-size: 50px; margin-top: 50px">
-					PRODUKTIVITAS ANDA : xx%
+				<div style="margin-bottom: 25px">
+					<i class="el-icon-user grey"></i>
+					<span
+						:class="
+							access.temperature && access.temperature > 37 ? 'red' : 'green'
+						"
+					>
+						{{ access.temperature || '-' }} &deg;C
+					</span>
+				</div>
+
+				<div
+					style="display: flex; align-items: center"
+					v-if="gate == 'OUT' && !first_in"
+				>
+					<i class="el-icon-setting grey"></i>
+					<div style="flex-grow: 1; margin-left: 25px; margin-right: 15px">
+						<el-progress
+							:text-inside="true"
+							:stroke-width="50"
+							:percentage="productivity"
+							:color="productivity < 100 ? 'red' : 'green'"
+							:show-text="false"
+						></el-progress>
+					</div>
+					<div
+						:class="productivity < 100 ? 'red' : 'green'"
+						style="font-size: 50px"
+					>
+						{{ productivity }}%
+					</div>
+				</div>
+
+				<div style="font-size: 50px; margin-top: 50px" v-if="gate == 'IN'">
+					SELAMAT DATANG
 				</div>
 			</el-card>
 		</div>
@@ -57,6 +85,11 @@ export default {
 		return {
 			popup: false,
 			access: {},
+			productivity: 0,
+			late: 0,
+			gate: null,
+			message: null,
+			first_in: false,
 			person: {},
 			echo: null,
 		}
@@ -77,6 +110,11 @@ export default {
 		this.echo.channel('log').listen('.log', (e) => {
 			this.$emit('new-data')
 			this.access = e.access
+			this.gate = e.gate
+			this.message = e.message
+			this.productivity = e.productivity
+			this.late = e.late
+			this.first_in = e.first_in
 			this.person = this.persons.find((p) => p.pin == e.access.pin) || {}
 
 			if (!this.popup) {
@@ -109,10 +147,10 @@ export default {
 	flex-direction: column;
 	justify-content: center;
 	justify-items: center;
-	font-size: 100px;
-	padding-left: 60px;
+	font-size: 80px;
+	padding-left: 40px;
 	/* hijau */
-	background-color: rgb(159, 255, 122);
+	/* background-color: rgb(159, 255, 122); */
 	/* merah */
 	/* background-color: rgb(255, 108, 108); */
 	/* background-color: gold; */
@@ -127,5 +165,13 @@ export default {
 .grey {
 	/* color: #ff5e0a; */
 	color: grey;
+}
+
+.red {
+	color: red;
+}
+
+.green {
+	color: rgb(18, 139, 18);
 }
 </style>

@@ -3,11 +3,8 @@
 namespace App\Events;
 
 use App\Models\Access;
-use App\Models\AttTransaction;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -18,22 +15,28 @@ class AttendanceEvent implements ShouldBroadcast
 
     public $access;
 
-    public $percentage;
+    public $message;
+
+    public $productivity;
+
+    public $gate;
 
     public $late;
+
+    public $first_in;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Access $access)
+    public function __construct(Access $access, $gate, $productivity = 0, $late = null, $first_in = false)
     {
         $this->access = $access;
-
-        // TODO: passing prosentase jika > jam 17.00
-        // $this->percentage = compact('hour', 'percent');
-        // passing terlambat berapa menit jika pertama kali absen
+        $this->productivity = $productivity;
+        $this->gate = $gate;
+        $this->late = $late;
+        $this->first_in = $first_in;
     }
 
     /**

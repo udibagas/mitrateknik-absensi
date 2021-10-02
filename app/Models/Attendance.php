@@ -38,7 +38,9 @@ class Attendance extends Model
         'jam_kerja_efektif',
         'prosentase',
         'work_duration',
-        'rest_duration'
+        'rest_duration',
+        'late',
+        'early'
     ];
 
     public static function booted()
@@ -163,6 +165,30 @@ class Attendance extends Model
     public function getRestDurationAttribute()
     {
         return static::secToTime($this->durasi_istirahat);
+    }
+
+    public function getLateAttribute()
+    {
+        $firstIn = new Carbon($this->first_in);
+        $signInTime = new Carbon($this->sign_in_time);
+
+        if ($firstIn > $signInTime) {
+            return $firstIn->diffInMinutes($signInTime);
+        }
+
+        return false;
+    }
+
+    public function getEarlyAttribute()
+    {
+        $lastOut = new Carbon($this->last_out);
+        $signOffTime = new Carbon($this->sign_off_time);
+
+        if ($lastOut > $signOffTime) {
+            $lastOut->diffInMinutes($signOffTime);
+        }
+
+        return false;
     }
 
     protected static function secToTime($seconds)
