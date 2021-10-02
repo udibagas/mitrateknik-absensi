@@ -3,6 +3,7 @@
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AccessController;
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\AttendaceController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\GateController;
@@ -31,7 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('area', [AreaController::class, 'index']);
     Route::get('department', [DepartmentController::class, 'index']);
-    Route::get('absensi', [AbsensiController::class, 'index']);
+    // Route::get('absensi', [AbsensiController::class, 'index']);
+    Route::get('attendance', [AttendaceController::class, 'index']);
     Route::get('person', [PersonController::class, 'index']);
     Route::get('person/{pin}', [PersonController::class, 'getByPin']);
     Route::get('device', [DeviceController::class, 'index']);

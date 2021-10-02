@@ -60,10 +60,11 @@ class Access extends Model
         'vid_linkage_hanlde',
         'event_time_date',
         'event_time_time',
-        'vid_linkage_handle'
+        'vid_linkage_handle',
+        'photo_path'
     ];
 
-    protected $appends = ['event_time_date', 'event_time_time'];
+    protected $appends = ['event_time_date', 'event_time_time', 'photo_path'];
 
     // id: 8a84 95ef 7bbe 88f3 017b bf3b 2a1f 0709 created : 2021-09-07 14:48:50.845, event_time: 2021-09-07 12:03:31, 0x47cdb684f50d9d
     // id: 8a8495ef7bbe88f3017bbf3b2a 5d070b created : 2021-09-07 14:48:50.909, event_time: 2021-09-07 12:03:33
@@ -82,6 +83,15 @@ class Access extends Model
     public function getEventTimeTimeAttribute()
     {
         return (new Carbon($this->event_time))->format('H:i:s');
+    }
+
+    public function getPhotoPathAttribute()
+    {
+        if (!$this->vid_linkage_handle) {
+            return null;
+        }
+
+        return env('SERVER_ABSENSI', 'http://10.4.21.111:8098') . $this->vid_linkage_handle;
     }
 
     public static function booted()

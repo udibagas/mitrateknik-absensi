@@ -19,10 +19,10 @@ class CreateAttendancesTable extends Migration
             $table->string('name')->comment('fullname');
             $table->string('department')->comment('department name');
             $table->string('pin');
-            $table->dateTime('first_in');
-            $table->dateTime('last_out')->nullable();
-            $table->dateTime('rest_start')->nullable();
-            $table->dateTime('rest_end')->nullable();
+            $table->time('first_in');
+            $table->time('last_out')->nullable();
+            $table->time('rest_start')->nullable();
+            $table->time('rest_end')->nullable();
             $table->tinyInteger('day')->comment('0 = minggu, 6 = sabtu');
             // slot related
             $table->time('sign_in_time')->default('08:00:00');

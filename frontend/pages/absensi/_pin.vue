@@ -95,10 +95,10 @@
 			<el-table stripe v-loading="loading" :data="tableData">
 				<el-table-column type="index" width="50" label="#"></el-table-column>
 
-				<el-table-column prop="att_date" label="Tanggal" sortable>
-					<template slot-scope="scope">
-						{{ $moment(scope.row.att_date).format('DD/MMM/YYYY') }} <br />
-						{{ $moment(scope.row.att_date).format('dddd') }}
+				<el-table-column prop="date" label="Tanggal" sortable>
+					<template slot-scope="{ row }">
+						{{ $moment(row.date).format('DD/MMM/YYYY') }} <br />
+						{{ row.hari }}
 					</template>
 				</el-table-column>
 
@@ -128,14 +128,14 @@
 				</el-table-column>
 
 				<el-table-column
-					prop="percentage"
+					prop="prosentase"
 					label="%"
 					sortable
 					align="right"
 					header-align="right"
 				>
 					<template slot-scope="{ row }">
-						{{ row.percentage.toFixed(2) }}
+						{{ row.prosentase }}
 					</template>
 				</el-table-column>
 			</el-table>
@@ -187,7 +187,7 @@ export default {
 
 	data() {
 		return {
-			url: '/api/absensi',
+			url: '/api/attendance',
 			paginated: '',
 			tableData: [],
 			filters: {
@@ -258,25 +258,25 @@ export default {
 
 		afterGet() {
 			this.chartOption.xAxis.data = this.tableData.map((d) => {
-				return d.att_date + '\n' + this.$moment(d.att_date).format('dddd')
+				return d.date + '\n' + d.hari
 			})
 
 			this.chartOption.series[0].data = this.tableData.map((d) => {
-				return d.actual_work_duration > 0
-					? (d.actual_work_duration / 3600).toFixed(2)
+				return d.jam_kerja_efektif > 0
+					? (d.jam_kerja_efektif / 3600).toFixed(2)
 					: 0
 			})
 
 			this.prodPercentAvg =
 				this.tableData.reduce(
-					(total, current) => Number(total) + Number(current.percentage),
+					(total, current) => Number(total) + Number(current.prosentase),
 					0
 				) / this.tableData.length
 
 			this.prodHourAvg =
 				this.tableData.reduce(
 					(total, current) =>
-						Number(total) + Number(current.actual_work_duration / 3600),
+						Number(total) + Number(current.jam_kerja_efektif / 3600),
 					0
 				) / this.tableData.length
 		},

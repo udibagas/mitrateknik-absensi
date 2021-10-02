@@ -29,23 +29,26 @@ class Attendance extends Model
     ];
 
     protected $appends = [
-        'day',
+        'hari',
         'jam_masuk_efektif',
         'jam_keluar_efektif',
-        'jam_mulai_istirahat',
-        'jam_selesai_istirahat',
+        'jam_mulai_istirahat_efektif',
+        'jam_selesai_istirahat_efektif',
         'durasi_istirahat',
         'jam_kerja_efektif',
-        'prosentase'
+        'prosentase',
+        'work_duration',
+        'rest_duration'
     ];
 
     public static function booted()
     {
         static::creating(function ($model) {
+            $day = date('w', strtotime($model->date));
             $model->id = Str::uuid()->toString();
+            $model->day = $day;
 
             //  dari hari kita akan tau time slot yang dipakai
-            $day = date('w', strtotime($model->date));
             $timeSlot = TimeSlot::where('day', $day)->first();
 
             // jika ada setingan timeslot isi dengan data timeslot, jika tidak ada biarkan default
@@ -69,7 +72,22 @@ class Attendance extends Model
         return 'string';
     }
 
-    public function getJamMasukEfektif()
+    public function getHariAttribute()
+    {
+        $hari = [
+            'MINGGU',
+            'SENIN',
+            'SELASA',
+            'RABU',
+            'KAMIS',
+            'JUMAT',
+            'SABTU'
+        ];
+
+        return key_exists($this->day, $hari) ? $hari[$this->day] : '';
+    }
+
+    public function getJamMasukEfektifAttribute()
     {
         $first_in = new Carbon($this->first_in);
         $slot_in = new Carbon($this->sign_in_time);
@@ -77,7 +95,7 @@ class Attendance extends Model
         return $first_in > $slot_in ? $first_in : $slot_in;
     }
 
-    public function getJamKeluarEfektif()
+    public function getJamKeluarEfektifAttribute()
     {
         $slot_out = new Carbon($this->sign_off_time);
 
@@ -89,7 +107,7 @@ class Attendance extends Model
         return $last_out > $slot_out ? $slot_out : $last_out;
     }
 
-    public function getJamMulaiIstirahatEfektif()
+    public function getJamMulaiIstirahatEfektifAttribute()
     {
         $slot_rest_start = new Carbon($this->rest_start_time);
 
@@ -101,7 +119,7 @@ class Attendance extends Model
         return $rest_start > $slot_rest_start ? $slot_rest_start : $rest_start;
     }
 
-    public function getJamSelesaiIstirahatEfektif()
+    public function getJamSelesaiIstirahatEfektifAttribute()
     {
         $slot_rest_end = new Carbon($this->rest_end_time);
 
@@ -133,6 +151,27 @@ class Attendance extends Model
 
     public function getProsentaseAttribute()
     {
-        return $this->jam_kerja_efektif / ($this->jam_kerja_max * 36);
+        return round(($this->jam_kerja_efektif / ($this->jam_kerja_max * 36)), 2);
+    }
+
+    public function getWorkDurationAttribute()
+    {
+        return static::secToTime($this->jam_kerja_efektif);
+    }
+
+    public function getRestDurationAttribute()
+    {
+        return static::secToTime($this->durasi_istirahat);
+    }
+
+    protected static function secToTime($seconds)
+    {
+        $h = floor($seconds / 3600);
+        $m = floor(($seconds % 3600) / 60);
+        $s = $seconds % 60;
+
+        return str_pad($h, 2, '0', STR_PAD_LEFT) . ':'
+            . str_pad($m, 2, '0', STR_PAD_LEFT) . ':'
+            . str_pad($s, 2, '0', STR_PAD_LEFT);
     }
 }

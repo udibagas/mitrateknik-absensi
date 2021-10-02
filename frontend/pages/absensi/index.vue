@@ -70,28 +70,23 @@
 			></el-table-column>
 
 			<el-table-column
-				prop="att_date"
+				prop="date"
 				label="Tanggal"
 				sortable="custom"
 				width="100"
 			>
 				<template slot-scope="{ row }">
-					{{ $moment(row.att_date).format('DD/MMM/YYYY') }} <br />
-					{{ $moment(row.att_date).format('dddd') }}
+					{{ $moment(row.date).format('DD/MMM/YYYY') }} <br />
+					{{ row.hari }}
 				</template>
 			</el-table-column>
 
-			<el-table-column
-				prop="fullname"
-				label="Nama"
-				sortable
-				show-overflow-tooltip
-			>
+			<el-table-column prop="name" label="Nama" sortable show-overflow-tooltip>
 				<template slot-scope="{ row }">
 					<nuxt-link
 						style="text-decoration: none"
 						:to="`/absensi/${row.pin}`"
-						>{{ row.fullname }}</nuxt-link
+						>{{ row.name }}</nuxt-link
 					>
 					<br />
 					NIK : {{ row.pin }}
@@ -99,9 +94,9 @@
 			</el-table-column>
 
 			<el-table-column
-				prop="dept_name"
+				prop="department"
 				label="Departemen"
-				column-key="dept_name"
+				column-key="department"
 				:filters="departments.map((d) => ({ value: d.name, text: d.name }))"
 				sortable="custom"
 			></el-table-column>
@@ -111,7 +106,8 @@
 				label="Masuk"
 				sortable="custom"
 				width="95"
-			></el-table-column>
+			>
+			</el-table-column>
 
 			<el-table-column label="Jam Istirahat" width="150">
 				<template slot-scope="{ row }">
@@ -142,15 +138,12 @@
 			</el-table-column>
 
 			<el-table-column
-				prop="percentage"
+				prop="prosentase"
 				label="%"
 				width="70"
 				align="right"
 				header-align="right"
 			>
-				<template slot-scope="{ row }">
-					{{ row.percentage.toFixed(2) }}
-				</template>
 			</el-table-column>
 		</el-table>
 
@@ -183,7 +176,7 @@ export default {
 
 	data() {
 		return {
-			url: '/api/absensi',
+			url: '/api/attendance',
 			filters: {
 				date: [
 					this.$moment().format('YYYY-MM-DD'),
