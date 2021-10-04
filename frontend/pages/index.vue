@@ -175,3 +175,17 @@ export default {
 	},
 }
 </script>
+
+<style scoped>
+.text-success {
+	color: green;
+}
+
+.text-warning {
+	color: orange;
+}
+
+.text-danger {
+	color: red;
+}
+</style>
