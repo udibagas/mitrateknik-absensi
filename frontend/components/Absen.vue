@@ -41,7 +41,7 @@
 					<i class="el-icon-user grey"></i>
 					<span
 						:class="
-							access.temperature && access.temperature > 37 ? 'red' : 'green'
+							access.temperature && access.temperature > 37.3 ? 'red' : 'green'
 						"
 					>
 						{{ access.temperature || '-' }} &deg;C
