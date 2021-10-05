@@ -123,19 +123,16 @@
 				<el-table-column
 					prop="work_duration"
 					label="Jam Kerja Efektif"
-					sortable
-				>
-				</el-table-column>
-
-				<el-table-column
-					prop="prosentase"
-					label="%"
-					sortable
-					align="right"
-					header-align="right"
+					min-width="160"
 				>
 					<template slot-scope="{ row }">
-						{{ row.prosentase }}
+						<el-progress
+							:text-inside="true"
+							:stroke-width="18"
+							:percentage="row.prosentase"
+							:color="row.prosentase < 100 ? 'red' : 'green'"
+						></el-progress>
+						{{ row.work_duration }}
 					</template>
 				</el-table-column>
 			</el-table>

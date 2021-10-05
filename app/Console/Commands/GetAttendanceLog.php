@@ -106,7 +106,9 @@ class GetAttendanceLog extends Command
                                 new Carbon("{$log->event_time_date} 12:30:00"),
                                 new Carbon("{$log->event_time_date} 13:30:00"),
                             )) {
-                                $attendance->update(['rest_end' => $log->event_time_time]);
+                                if (!$attendance->rest_end) {
+                                    $attendance->update(['rest_end' => $log->event_time_time]);
+                                }
                             }
                         }
                     }
