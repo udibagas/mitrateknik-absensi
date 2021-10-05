@@ -123,7 +123,7 @@
 				<el-table-column
 					prop="work_duration"
 					label="Jam Kerja Efektif"
-					min-width="160"
+					width="160"
 				>
 					<template slot-scope="{ row }">
 						<el-progress
