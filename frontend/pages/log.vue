@@ -61,38 +61,48 @@
 			height="calc(100vh - 235px)"
 		>
 			<el-table-column
-				type="index"
-				label="#"
-				:index="tableData.from"
-			></el-table-column>
-
-			<el-table-column
 				prop="event_time"
 				label="Tanggal"
 				sortable="custom"
-				min-width="120"
+				width="100"
 			>
 				<template slot-scope="scope">
-					{{ $moment(scope.row.event_time).format('DD-MMM-YYYY') }}
+					{{ $moment(scope.row.event_time).format('DD/MMM/YYYY') }} <br />
+					{{ $moment(scope.row.event_time).format('dddd') }}
 				</template>
 			</el-table-column>
 
 			<el-table-column
-				prop="pin"
-				label="NIK"
-				sortable="custom"
-				min-width="100"
-			></el-table-column>
-
-			<el-table-column
 				prop="name"
 				label="Nama"
-				sortable="custom"
+				sortable
 				show-overflow-tooltip
-				min-width="150"
+				min-width="180"
 			>
-				<template slot-scope="scope">
-					{{ scope.row.name }} {{ scope.row.last_name }}
+				<template slot-scope="{ row }">
+					<div class="flex" style="align-items: center">
+						<div
+							style="
+								width: 45px;
+								height: 45px;
+								border: 1px solid #ddd;
+								object-fit: cover;
+								border-radius: 50%;
+							"
+						>
+							<img
+								:src="row.photo_path"
+								alt=""
+								style="width: 45px; border-radius: 50%"
+								referrerpolicy="no-referrer"
+							/>
+						</div>
+						<div style="margin-left: 10px; flex-grow: 0">
+							{{ row.name }} {{ row.last_name }}
+							<br />
+							NIK : {{ row.pin }}
+						</div>
+					</div>
 				</template>
 			</el-table-column>
 
@@ -112,8 +122,24 @@
 				sortable="custom"
 				min-width="100"
 			>
-				<template slot-scope="scope">
-					{{ $moment(scope.row.event_time).format('HH:mm:ss') }}
+				<template slot-scope="{ row }">
+					{{ $moment(row.event_time).format('HH:mm:ss') }}
+				</template>
+			</el-table-column>
+
+			<el-table-column
+				prop="temperature"
+				label="Suhu"
+				sortable="custom"
+				min-width="100"
+			>
+				<template slot-scope="{ row }">
+					<span
+						v-if="row.temperature"
+						:class="row.temperature > 37.3 ? 'text-red' : 'text-green'"
+					>
+						{{ row.temperature }} &deg;C
+					</span>
 				</template>
 			</el-table-column>
 
@@ -124,6 +150,18 @@
 				min-width="150"
 				show-overflow-tooltip
 			></el-table-column>
+
+			<el-table-column label="Produktifitas" width="160">
+				<template slot-scope="{ row }">
+					<el-progress
+						:text-inside="true"
+						:stroke-width="18"
+						:percentage="row.attendance.prosentase"
+						:color="row.attendance.prosentase < 100 ? 'red' : 'green'"
+					></el-progress>
+					{{ row.attendance.work_duration }}
+				</template>
+			</el-table-column>
 
 			<el-table-column
 				width="70"
@@ -141,8 +179,9 @@
 						type="text"
 						size="small"
 						@click.prevent="openForm(scope.row)"
-						>Edit</el-button
 					>
+						Edit
+					</el-button>
 				</template>
 			</el-table-column>
 		</el-table>

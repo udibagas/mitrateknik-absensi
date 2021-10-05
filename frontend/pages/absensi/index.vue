@@ -190,15 +190,6 @@
 					{{ row.work_duration }}
 				</template>
 			</el-table-column>
-
-			<!-- <el-table-column
-				prop="prosentase"
-				label="%"
-				width="70"
-				align="right"
-				header-align="right"
-			>
-			</el-table-column> -->
 		</el-table>
 
 		<br />
