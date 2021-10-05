@@ -61,10 +61,11 @@ class Access extends Model
         'event_time_date',
         'event_time_time',
         'vid_linkage_handle',
-        'photo_path'
+        'photo_path',
+        'attendance'
     ];
 
-    protected $appends = ['event_time_date', 'event_time_time', 'photo_path'];
+    protected $appends = ['event_time_date', 'event_time_time', 'photo_path', 'attendance'];
 
     // id: 8a84 95ef 7bbe 88f3 017b bf3b 2a1f 0709 created : 2021-09-07 14:48:50.845, event_time: 2021-09-07 12:03:31, 0x47cdb684f50d9d
     // id: 8a8495ef7bbe88f3017bbf3b2a 5d070b created : 2021-09-07 14:48:50.909, event_time: 2021-09-07 12:03:33
@@ -108,6 +109,18 @@ class Access extends Model
         static::creating(function ($model) {
             $model->id = str_replace('-', '', Str::uuid()->toString());
         });
+    }
+
+    public function getAttendanceAttribute()
+    {
+        $data = Attendance::where('pin', $this->pin)
+            ->where('date', $this->event_time_date)
+            ->first();
+
+        return [
+            'prosentase' => $data ? $data->prosentase : 0,
+            'work_duration' => $data ? $data->work_duration : '00:00:00',
+        ];
     }
 
     /**
