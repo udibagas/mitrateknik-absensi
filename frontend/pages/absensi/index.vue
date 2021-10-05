@@ -90,7 +90,23 @@
 			>
 				<template slot-scope="{ row }">
 					<div class="flex" style="align-items: center">
-						<el-avatar :size="45" :src="row.person.photo_path"></el-avatar>
+						<!-- <el-avatar :size="45" :src="row.person.photo_path"></el-avatar> -->
+						<div
+							style="
+								width: 45px;
+								height: 45px;
+								border: 1px solid #ddd;
+								border-radius: 50%;
+								object-fit: cover;
+							"
+						>
+							<img
+								:src="row.person.photo_path"
+								alt=""
+								style="width: 45px"
+								referrerpolicy="no-referrer"
+							/>
+						</div>
 						<div style="margin-left: 10px; flex-grow: 0">
 							<nuxt-link
 								style="text-decoration: none"
