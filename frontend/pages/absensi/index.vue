@@ -96,14 +96,14 @@
 								width: 45px;
 								height: 45px;
 								border: 1px solid #ddd;
-								border-radius: 50%;
 								object-fit: cover;
+								border-radius: 50%;
 							"
 						>
 							<img
 								:src="row.person.photo_path"
 								alt=""
-								style="width: 45px"
+								style="width: 45px; border-radius: 50%"
 								referrerpolicy="no-referrer"
 							/>
 						</div>
