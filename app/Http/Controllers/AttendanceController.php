@@ -12,7 +12,11 @@ class AttendanceController extends Controller
         $data = Attendance::with(['person:pin,photo_path,gender'])->when($request->pin, function ($q) use ($request) {
             $q->where('pin', $request->pin);
         })->when($request->keyword, function ($q) use ($request) {
-            $q->where('keyword', 'LIKE', "%{$request->keyword}%");
+            $q->where(function ($q) use ($request) {
+                $q->where('name', 'LIKE', "%{$request->keyword}%")
+                    ->orWhere('pin', 'LIKE', "%{$request->keyword}%")
+                    ->orWhere('department', 'LIKE', "%{$request->keyword}%");
+            });
         })->when($request->department, function ($q) use ($request) {
             if (is_array($request->department)) {
                 $q->whereIn('department', $request->department);
