@@ -70,6 +70,11 @@ class Access extends Model
     // id: 8a8495ef7bbe88f3017bbf3b2a 5d070b created : 2021-09-07 14:48:50.909, event_time: 2021-09-07 12:03:33
     // id: 8a8495ef7bbf4e30017bbf62ec 28001b created : 2021-09-07 15:32:16.423, event_time: 2021-09-07 15:32:06
 
+    public function person()
+    {
+        return $this->belongsTo(Person::class, 'pin', 'pin');
+    }
+
     public function gate()
     {
         return $this->belongsTo(Gate::class, 'event_point_id');
@@ -88,6 +93,10 @@ class Access extends Model
     public function getPhotoPathAttribute()
     {
         if (!$this->vid_linkage_handle) {
+            if ($this->person) {
+                return $this->person->photo_path;
+            }
+
             return null;
         }
 

@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use Illuminate\Http\Request;
 
-class AttendaceController extends Controller
+class AttendanceController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Attendance::when($request->pin, function ($q) use ($request) {
+        $data = Attendance::with(['person:pin,photo_path,gender'])->when($request->pin, function ($q) use ($request) {
             $q->where('pin', $request->pin);
         })->when($request->keyword, function ($q) use ($request) {
             $q->where('keyword', 'LIKE', "%{$request->keyword}%");

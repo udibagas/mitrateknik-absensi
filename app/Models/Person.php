@@ -26,7 +26,7 @@ class Person extends Model
         'initial_name'
     ];
 
-    protected $appends = ['initial_name'];
+    protected $appends = ['initial_name', 'photo_path'];
 
     public $timestamps = false;
 

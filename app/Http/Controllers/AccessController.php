@@ -143,6 +143,49 @@ class AccessController extends Controller
     {
         // hanya untuk update jamnya saja
         $access->update(['event_time' => "{$request->event_time_date} {$request->event_time_time}"]);
+
+        // proses data attendance
+        $attendance = Attendance::where('pin', $access->pin)->where('date', $access->event_time_date)->first();
+        $gate = strtoupper(substr($access->event_point_name, -2));
+
+        // kalau gak ada anggap aja sebagai first_in
+        if (!$attendance) {
+            $attendance = Attendance::create([
+                'date' => $access->event_time_date,
+                'pin' => $access->pin,
+                'name' => "{$access->name} {$access->last_name}",
+                'department' => $access->dept_name,
+                'first_in' => $access->event_time_time
+            ]);
+        } else {
+            // jika lewat gate in
+            if ($gate == 'IN') {
+                if ((new Carbon($access->event_time))->between(
+                    new Carbon("{$access->event_time_date} 12:30:00"),
+                    new Carbon("{$access->event_time_date} 13:30:00"),
+                )) {
+                    $attendance->update(['rest_end' => $access->event_time_time]);
+                } else {
+                    // kemungkinan tujuannya buat ngedit
+                }
+            }
+
+            // jika lewat gate out, kemungkinan kecil akan ngubah yg ini
+            if ($gate == 'UT') {
+                $data = ['last_out' => $access->event_time_time];
+
+                // jika di range waktu istirahat
+                if ((new Carbon($access->event_time))->between(
+                    new Carbon("{$access->event_time_date} 11:30:00"),
+                    new Carbon("{$access->event_time_date} 12:55:00"),
+                )) {
+                    $data['rest_start'] = $access->event_time_time;
+                }
+
+                $attendance->update($data);
+            }
+        }
+
         return ['message' => 'Data telah disimpan', 'data' => $access];
     }
 }

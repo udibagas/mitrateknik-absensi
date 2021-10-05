@@ -81,15 +81,26 @@
 				</template>
 			</el-table-column>
 
-			<el-table-column prop="name" label="Nama" sortable show-overflow-tooltip>
+			<el-table-column
+				prop="name"
+				label="Nama"
+				sortable
+				show-overflow-tooltip
+				min-width="180"
+			>
 				<template slot-scope="{ row }">
-					<nuxt-link
-						style="text-decoration: none"
-						:to="`/absensi/${row.pin}`"
-						>{{ row.name }}</nuxt-link
-					>
-					<br />
-					NIK : {{ row.pin }}
+					<div class="flex" style="align-items: center">
+						<el-avatar :size="45" :src="row.person.photo_path"></el-avatar>
+						<div style="margin-left: 10px; flex-grow: 0">
+							<nuxt-link
+								style="text-decoration: none"
+								:to="`/absensi/${row.pin}`"
+								>{{ row.name }}</nuxt-link
+							>
+							<br />
+							NIK : {{ row.pin }}
+						</div>
+					</div>
 				</template>
 			</el-table-column>
 
@@ -97,6 +108,7 @@
 				prop="department"
 				label="Departemen"
 				column-key="department"
+				min-width="150"
 				:filters="departments.map((d) => ({ value: d.name, text: d.name }))"
 				sortable="custom"
 			></el-table-column>
@@ -107,20 +119,32 @@
 				sortable="custom"
 				width="95"
 			>
-			</el-table-column>
-
-			<el-table-column label="Jam Istirahat" width="150">
 				<template slot-scope="{ row }">
-					{{ row.rest_start }} - {{ row.rest_end }}
+					<span :class="row.late ? 'text-red' : 'text-green'">{{
+						row.first_in
+					}}</span>
 				</template>
 			</el-table-column>
 
 			<el-table-column
+				label="Jam Istirahat"
+				width="150"
+				align="center"
+				header-align="center"
+			>
+				<template slot-scope="{ row }">
+					{{ row.rest_start || row.rest_start_time }} -
+					{{ row.rest_end || row.rest_end_time }} <br />
+					<strong> {{ row.rest_duration }} </strong>
+				</template>
+			</el-table-column>
+
+			<!-- <el-table-column
 				label="Durasi Istirahat"
 				prop="rest_duration"
 				width="150"
 			>
-			</el-table-column>
+			</el-table-column> -->
 
 			<el-table-column
 				prop="last_out"
@@ -128,6 +152,11 @@
 				sortable="custom"
 				width="95"
 			>
+				<template slot-scope="{ row }">
+					<span :class="row.early ? 'text-red' : 'text-green'">{{
+						row.last_out
+					}}</span>
+				</template>
 			</el-table-column>
 
 			<el-table-column
@@ -135,16 +164,25 @@
 				label="Jam Kerja Efektif"
 				width="160"
 			>
+				<template slot-scope="{ row }">
+					<el-progress
+						:text-inside="true"
+						:stroke-width="18"
+						:percentage="row.prosentase"
+						:color="row.prosentase < 100 ? 'red' : 'green'"
+					></el-progress>
+					{{ row.work_duration }}
+				</template>
 			</el-table-column>
 
-			<el-table-column
+			<!-- <el-table-column
 				prop="prosentase"
 				label="%"
 				width="70"
 				align="right"
 				header-align="right"
 			>
-			</el-table-column>
+			</el-table-column> -->
 		</el-table>
 
 		<br />

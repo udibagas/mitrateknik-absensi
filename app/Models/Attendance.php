@@ -43,6 +43,11 @@ class Attendance extends Model
         'early'
     ];
 
+    public function person()
+    {
+        return $this->belongsTo(Person::class, 'pin', 'pin');
+    }
+
     public static function booted()
     {
         static::creating(function ($model) {
