@@ -64,7 +64,7 @@ class KoreksiAbsensi extends Command
                 ],
             );
 
-            $access = Access::where('pin', $this->argument('pin'))
+            $access = Access::where('pin', $attendance->pin)
                 ->whereDate('event_time', $this->argument('date'))
                 ->get()->map(function ($i) {
                     return [$i->event_time_time, $i->event_point_name];
