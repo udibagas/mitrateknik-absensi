@@ -148,6 +148,10 @@ class Attendance extends Model
 
     public function getJamKerjaEfektifAttribute()
     {
+        if (!$this->last_out) {
+            return 0;
+        }
+
         $first_in = new Carbon($this->jamMasukEfektif);
         $last_out = new Carbon($this->jamKeluarEfektif);
 
@@ -158,6 +162,10 @@ class Attendance extends Model
 
     public function getProsentaseAttribute()
     {
+        if (!$this->last_out) {
+            return 0;
+        }
+
         $jamKerjaMax = $this->jam_kerja_max ?: 8;
         return round(($this->jam_kerja_efektif / ($jamKerjaMax * 36)), 2);
     }

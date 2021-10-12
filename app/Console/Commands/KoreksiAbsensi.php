@@ -65,6 +65,7 @@ class KoreksiAbsensi extends Command
             );
 
             $access = Access::where('pin', $attendance->pin)
+                ->orderBy('event_time', 'asc')
                 ->whereDate('event_time', $this->argument('date'))
                 ->get()->map(function ($i) {
                     return [$i->event_time_time, $i->event_point_name];
@@ -81,8 +82,9 @@ class KoreksiAbsensi extends Command
             // TODO: update jam istirahat juga
             $attendance->update([
                 'first_in' => $access[0][0],
-                'last_out' => end($access)[0],
+                'last_out' => count($access) > 0 ? end($access)[0] : null,
             ]);
+
             $attendance->refresh();
 
             $this->line('CORRECTIVE DATA:');

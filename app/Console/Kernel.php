@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command('absensi:koreksi ' . date('Y-m-d'))->daily()->at('08:30');
         $schedule->command('absensi:koreksi ' . date('Y-m-d'))->daily()->at('17:30');
         $schedule->command('websockets:clean')->daily();
         $schedule->command('telescope:prune')->daily();
