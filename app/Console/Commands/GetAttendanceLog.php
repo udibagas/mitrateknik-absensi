@@ -102,6 +102,12 @@ class GetAttendanceLog extends Command
 
                         // jika lewat gate in
                         if ($gate == 'IN') {
+                            // koreksi jam masuk
+                            if (strtotime($log->event_time_time) < strtotime($attendance->first_in)) {
+                                $attendance->update(['first_in' => $log->event_time_time]);
+                            }
+
+                            // update jam akhir istirahat
                             if ((new Carbon($log->event_time))->between(
                                 new Carbon("{$log->event_time_date} 12:30:00"),
                                 new Carbon("{$log->event_time_date} 13:30:00"),
