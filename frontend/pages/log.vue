@@ -306,6 +306,7 @@
 		</el-dialog>
 
 		<Absen @new-data="refreshData" />
+		<Counter />
 	</el-card>
 </template>
 
