@@ -46,43 +46,44 @@ export default {
 	},
 
 	methods: {
-		async getSlot() {
-			const slots = await this.$axios.$get('/api/timeSlot')
-			this.slot = slots.find((s) => s.day == new Date().getDay())
+		getSlot() {
+			this.$axios.$get('/api/timeSlot').then((slots) => {
+				this.slot = slots.find((s) => s.day == new Date().getDay())
 
-			this.interval = setInterval(() => {
-				const rest = this.$moment(this.slot.rest_start, 'HH:mm:ss')
-				const out = this.$moment(this.slot.out, 'HH:mm:ss')
-				const now = this.$moment()
-				this.counter_rest = this.$moment(rest - now).format('mm:ss.SS')
-				this.counter_out = this.$moment(out - now).format('mm:ss.SS')
+				this.interval = setInterval(() => {
+					const rest = this.$moment(this.slot.rest_start, 'HH:mm:ss')
+					const out = this.$moment(this.slot.out, 'HH:mm:ss')
+					const now = this.$moment()
+					this.counter_rest = this.$moment(rest - now).format('mm:ss.SS')
+					this.counter_out = this.$moment(out - now).format('mm:ss.SS')
 
-				const diff_to_rest = rest.diff(now, 'seconds')
-				const diff_to_out = out.diff(now, 'seconds')
+					const diff_to_rest = rest.diff(now, 'seconds')
+					const diff_to_out = out.diff(now, 'seconds')
 
-				if (
-					(diff_to_rest <= this.counter_duration && diff_to_rest > 0) ||
-					(diff_to_out <= this.counter_duration && diff_to_out > 0)
-				) {
-					if (diff_to_rest <= this.counter_duration) {
-						this.is_going_to_rest = true
+					if (
+						(diff_to_rest <= this.counter_duration && diff_to_rest > 0) ||
+						(diff_to_out <= this.counter_duration && diff_to_out > 0)
+					) {
+						if (diff_to_rest <= this.counter_duration) {
+							this.is_going_to_rest = true
+						}
+
+						if (diff_to_out <= this.counter_duration) {
+							this.is_going_to_out = true
+						}
+
+						if (!this.show) {
+							this.show = true
+						}
+					} else {
+						if (this.show) {
+							this.show = false
+							this.is_going_to_rest = false
+							this.is_going_to_out = false
+						}
 					}
-
-					if (diff_to_out <= this.counter_duration) {
-						this.is_going_to_out = true
-					}
-
-					if (!this.show) {
-						this.show = true
-					}
-				} else {
-					if (this.show) {
-						this.show = false
-						this.is_going_to_rest = false
-						this.is_going_to_out = false
-					}
-				}
-			}, 100)
+				}, 300)
+			})
 		},
 	},
 
