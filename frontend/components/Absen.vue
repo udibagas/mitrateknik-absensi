@@ -58,12 +58,12 @@
 							:text-inside="true"
 							:stroke-width="50"
 							:percentage="productivity"
-							:color="productivity < 100 ? 'red' : 'green'"
+							:color="productivity < 97 ? 'red' : 'green'"
 							:show-text="false"
 						></el-progress>
 					</div>
 					<div
-						:class="productivity < 100 ? 'red' : 'green'"
+						:class="productivity < 97 ? 'red' : 'green'"
 						style="font-size: 50px"
 					>
 						{{ productivity }}%

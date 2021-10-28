@@ -157,7 +157,7 @@
 						:text-inside="true"
 						:stroke-width="18"
 						:percentage="row.attendance.prosentase"
-						:color="row.attendance.prosentase < 100 ? 'red' : 'green'"
+						:color="row.attendance.prosentase < 97 ? 'red' : 'green'"
 					></el-progress>
 					{{ row.attendance.work_duration }}
 				</template>

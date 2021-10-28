@@ -185,7 +185,7 @@
 						:text-inside="true"
 						:stroke-width="18"
 						:percentage="row.prosentase"
-						:color="row.prosentase < 100 ? 'red' : 'green'"
+						:color="row.prosentase < 97 ? 'red' : 'green'"
 					></el-progress>
 					{{ row.work_duration }}
 				</template>
