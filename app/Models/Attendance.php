@@ -94,6 +94,11 @@ class Attendance extends Model
         return key_exists($this->day, $hari) ? $hari[$this->day] : '';
     }
 
+    public function getLastOutAttribute($value)
+    {
+        return $value ?: date('H:i:s');
+    }
+
     public function getJamMasukEfektifAttribute()
     {
         $first_in = new Carbon($this->first_in);
