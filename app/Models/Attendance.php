@@ -191,7 +191,7 @@ class Attendance extends Model
         $lastOut = new Carbon($this->last_out);
         $signOffTime = new Carbon($this->sign_off_time);
 
-        if ($lastOut > $signOffTime) {
+        if ($lastOut < $signOffTime) {
             return $lastOut->diffInMinutes($signOffTime);
         }
 
