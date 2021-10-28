@@ -108,7 +108,7 @@ class Attendance extends Model
 
         // jika belum keluar set keluar adalah waktu saat ini
         if (!$this->last_out) {
-            $now = Carbon::now();
+            $now = new Carbon(date('H:i:s'));
             return $now < $slot_out ? $now : $slot_out;
         }
 
