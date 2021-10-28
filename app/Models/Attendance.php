@@ -94,11 +94,6 @@ class Attendance extends Model
         return key_exists($this->day, $hari) ? $hari[$this->day] : '';
     }
 
-    public function getLastOutAttribute($value)
-    {
-        return $value ?: date('H:i:s');
-    }
-
     public function getJamMasukEfektifAttribute()
     {
         $first_in = new Carbon($this->first_in);
@@ -111,8 +106,10 @@ class Attendance extends Model
     {
         $slot_out = new Carbon($this->sign_off_time);
 
+        // jika belum keluar set keluar adalah waktu saat ini
         if (!$this->last_out) {
-            return $slot_out;
+            $now = Carbon::now();
+            return $now < $slot_out ? $now : $slot_out;
         }
 
         $last_out = new Carbon($this->last_out);
@@ -153,10 +150,6 @@ class Attendance extends Model
 
     public function getJamKerjaEfektifAttribute()
     {
-        if (!$this->last_out) {
-            return 0;
-        }
-
         $first_in = new Carbon($this->jamMasukEfektif);
         $last_out = new Carbon($this->jamKeluarEfektif);
 
@@ -167,10 +160,6 @@ class Attendance extends Model
 
     public function getProsentaseAttribute()
     {
-        if (!$this->last_out) {
-            return 0;
-        }
-
         $jamKerjaMax = $this->jam_kerja_max ?: 8;
         return round(($this->jam_kerja_efektif / ($jamKerjaMax * 36)), 2);
     }
