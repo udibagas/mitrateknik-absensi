@@ -71,7 +71,6 @@ class GetAttendanceLog extends Command
                     $lastData = $log;
                     // ambil data attendace untuk user & tanggal terkait
                     $attendance = Attendance::where('pin', $log->pin)->where('date', $log->event_time_date)->first();
-                    $gate = strtoupper(substr($log->event_point_name, -2));
 
                     // kalau gak ada anggap aja sebagai first_in
                     if (!$attendance) {
@@ -86,7 +85,7 @@ class GetAttendanceLog extends Command
                     } else {
                         $first_in = false;
                         // jika lewat gate out
-                        if ($gate == 'UT') {
+                        if ($log->gate == 'UT') {
                             $data = ['last_out' => $log->event_time_time];
 
                             // jika di range waktu istirahat
@@ -101,7 +100,7 @@ class GetAttendanceLog extends Command
                         }
 
                         // jika lewat gate in
-                        if ($gate == 'IN') {
+                        if ($log->gate == 'IN') {
                             // koreksi jam masuk
                             if (strtotime($log->event_time_time) < strtotime($attendance->first_in)) {
                                 $attendance->update(['first_in' => $log->event_time_time]);
@@ -127,11 +126,11 @@ class GetAttendanceLog extends Command
                         $this->line("Name = {$log->name}");
                         $this->line("Time = {$log->event_time}");
                         $this->line("Temp = {$log->temperature}");
-                        $this->line($gate == 'IN' ? 'Gate = IN' : 'Gate = OUT');
+                        $this->line($log->gate == 'IN' ? 'Gate = IN' : 'Gate = OUT');
                         $this->line("Pros = {$attendance->prosentase}%");
                         $this->line("Late = {$attendance->late} menit");
                         $this->line('--------------------------------------');
-                        AttendanceEvent::dispatch($log, $gate == 'IN' ? 'IN' : 'OUT', $attendance->prosentase, $attendance->late, $first_in);
+                        AttendanceEvent::dispatch($log, $log->gate == 'IN' ? 'IN' : 'OUT', $attendance->prosentase, $attendance->late, $first_in);
                     }
                 }
 
