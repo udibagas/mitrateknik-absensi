@@ -116,6 +116,9 @@ class GetAttendanceLog extends Command
                                     $attendance->update(['rest_end' => $log->event_time_time]);
                                 }
                             }
+
+                            // last out dibikin null lagi
+                            $attendance->update(['last_out' => null]);
                         }
                     }
 
